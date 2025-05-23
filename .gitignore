@@ -1,13 +1,14 @@
 # [1] Compiled Outputs
-atm              # Final binary
+atm             # Final binary
 *.a                 # Static libraries
 *.so                # Shared objects
 *.dylib             # macOS dynamic libraries
-
+data
 # [2] Object Files
 **/*.o
 **/*.obj
 **/*.ko
+atm
 
 # [3] Build System Artifacts
 *.d                 # Auto-generated dependencies
