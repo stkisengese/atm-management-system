@@ -1,0 +1,14 @@
+# [1] Compiled Outputs
+atm              # Final binary
+*.a                 # Static libraries
+*.so                # Shared objects
+*.dylib             # macOS dynamic libraries
+
+# [2] Object Files
+**/*.o
+**/*.obj
+**/*.ko
+
+# [3] Build System Artifacts
+*.d                 # Auto-generated dependencies
+Makefile.local      # Local make customizationsss
