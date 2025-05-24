@@ -1,7 +1,13 @@
+#ifndef HEADER_H
+#define HEADER_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include "../sqlite/sqlite3.h"
 
+// Date structure
 struct Date
 {
     int month, day, year;
@@ -29,12 +35,20 @@ struct User
     char password[50];
 };
 
+// database functions
+int initDatabase();
+sqlite3 *getDatabase();
+void closeDatabase();
+
 // authentication functions
 void loginMenu(char a[50], char pass[50]);
 void registerMenu(char a[50], char pass[50]);
-const char *getPassword(struct User u);
+int getPassword(struct User *u);
+int registerUser(char name[50], char password[50]);
 
 // system function
 void createNewAcc(struct User u);
 void mainMenu(struct User u);
 void checkAllAccounts(struct User u);
+
+#endif // HEADER_H
