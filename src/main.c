@@ -45,10 +45,12 @@ void mainMenu(struct User u)
         // here
         break;
     case 8:
-        exit(1);
+        closeDatabase();
+        exit(0);
         break;
     default:
         printf("Invalid operation!\n");
+        mainMenu(u);
     }
 };
 
@@ -69,24 +71,41 @@ void initMenu(struct User *u)
         {
         case 1:
             loginMenu(u->name, u->password);
-            if (strcmp(u->password, getPassword(*u)) == 0)
+            if (getPassword(u) && strcmp(u->password, u->password) == 0)
             {
-                printf("\n\nPassword Match!");
+                printf("\n\nLogin successful!");
+                sleep(1);
             }
             else
             {
-                printf("\nWrong password!! or User Name\n");
-                exit(1);
+                printf("\nWrong password or username!\n");
+                sleep(2);
+                initMenu(u);
+                return;
             }
             r = 1;
             break;
         case 2:
-            // student TODO : add your **Registration** function
-            // here
-            r = 1;
-            break;
+        {
+            char temp_name[50], temp_pass[50];
+            registerMenu(temp_name, temp_pass);
+            if (registerUser(temp_name, temp_pass))
+            {
+                printf("\n\nRegistration successful! Please login.");
+                sleep(2);
+                initMenu(u);
+            }
+            else
+            {
+                printf("\n\nRegistration failed! Username might already exist.");
+                sleep(2);
+                initMenu(u);
+            }
+            return;
+        }
         case 3:
-            exit(1);
+            closeDatabase();
+            exit(0);
             break;
         default:
             printf("Insert a valid operation!\n");
@@ -97,8 +116,15 @@ void initMenu(struct User *u)
 int main()
 {
     struct User u;
-    
+
+    if (initDatabase() != 0)
+    {
+        printf("Failed to initialize database!\n");
+        return 1;
+    }
+
     initMenu(&u);
     mainMenu(u);
+    closeDatabase();
     return 0;
 }
