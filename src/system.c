@@ -1,39 +1,5 @@
 #include "header.h"
 
-const char *RECORDS = "./data/records.txt";
-
-int getAccountFromFile(FILE *ptr, char name[50], struct Record *r)
-{
-    return fscanf(ptr, "%d %d %s %d %d/%d/%d %s %d %lf %s",
-                  &r->id,
-                  &r->userId,
-                  name,
-                  &r->accountNbr,
-                  &r->deposit.month,
-                  &r->deposit.day,
-                  &r->deposit.year,
-                  r->country,
-                  &r->phone,
-                  &r->amount,
-                  r->accountType) != EOF;
-}
-
-void saveAccountToFile(FILE *ptr, struct User u, struct Record r)
-{
-    fprintf(ptr, "%d %d %s %d %d/%d/%d %s %d %.2lf %s\n\n",
-            r.id,
-            u.id,
-            u.name,
-            r.accountNbr,
-            r.deposit.month,
-            r.deposit.day,
-            r.deposit.year,
-            r.country,
-            r.phone,
-            r.amount,
-            r.accountType);
-}
-
 void stayOrReturn(int notGood, void f(struct User u), struct User u)
 {
     int option;
@@ -49,7 +15,10 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
         else if (option == 1)
             mainMenu(u);
         else if (option == 2)
+        {
+            closeDatabase();
             exit(0);
+        }
         else
         {
             printf("Insert a valid operation!\n");
@@ -69,7 +38,8 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
     else
     {
         system("clear");
-        exit(1);
+        closeDatabase();
+        exit(0);
     }
 }
 
@@ -87,7 +57,8 @@ invalid:
     }
     else if (option == 0)
     {
-        exit(1);
+        closeDatabase();
+        exit(0);
     }
     else
     {
@@ -99,9 +70,8 @@ invalid:
 void createNewAcc(struct User u)
 {
     struct Record r;
-    struct Record cr;
-    char userName[50];
-    FILE *pf = fopen(RECORDS, "a+");
+    sqlite3 *db = getDatabase();
+    sqlite3_stmt *stmt;
 
 noAccount:
     system("clear");
@@ -112,14 +82,25 @@ noAccount:
     printf("\nEnter the account number:");
     scanf("%d", &r.accountNbr);
 
-    while (getAccountFromFile(pf, userName, &cr))
+    // Check if account already exists for this user
+    char check_sql[] = "SELECT COUNT(*) FROM records WHERE user_id = ? AND account_id = ?";
+    int rc = sqlite3_prepare_v2(db, check_sql, -1, &stmt, NULL);
+    if (rc == SQLITE_OK)
     {
-        if (strcmp(userName, u.name) == 0 && cr.accountNbr == r.accountNbr)
+        sqlite3_bind_int(stmt, 1, u.id);
+        sqlite3_bind_int(stmt, 2, r.accountNbr);
+
+        rc = sqlite3_step(stmt);
+        if (rc == SQLITE_ROW && sqlite3_column_int(stmt, 0) > 0)
         {
             printf("✖ This Account already exists for this user\n\n");
+            sqlite3_finalize(stmt);
+            sleep(2);
             goto noAccount;
         }
+        sqlite3_finalize(stmt);
     }
+
     printf("\nEnter the country:");
     scanf("%s", r.country);
     printf("\nEnter the phone number:");
@@ -129,37 +110,86 @@ noAccount:
     printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
     scanf("%s", r.accountType);
 
-    saveAccountToFile(pf, u, r);
+    // Insert new account record
+    char insert_sql[] = "INSERT INTO records (user_id, user_name, account_id, deposit_date, country, phone, balance, account_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    rc = sqlite3_prepare_v2(db, insert_sql, -1, &stmt, NULL);
 
-    fclose(pf);
-    success(u);
+    if (rc == SQLITE_OK)
+    {
+        char date_str[20];
+        sprintf(date_str, "%d/%d/%d", r.deposit.month, r.deposit.day, r.deposit.year);
+
+        sqlite3_bind_int(stmt, 1, u.id);
+        sqlite3_bind_text(stmt, 2, u.name, -1, SQLITE_STATIC);
+        sqlite3_bind_int(stmt, 3, r.accountNbr);
+        sqlite3_bind_text(stmt, 4, date_str, -1, SQLITE_STATIC);
+        sqlite3_bind_text(stmt, 5, r.country, -1, SQLITE_STATIC);
+        sqlite3_bind_int(stmt, 6, r.phone);
+        sqlite3_bind_double(stmt, 7, r.amount);
+        sqlite3_bind_text(stmt, 8, r.accountType, -1, SQLITE_STATIC);
+
+        rc = sqlite3_step(stmt);
+        sqlite3_finalize(stmt);
+
+        if (rc == SQLITE_DONE)
+        {
+            success(u);
+        }
+        else
+        {
+            printf("Error creating account: %s\n", sqlite3_errmsg(db));
+            sleep(2);
+            mainMenu(u);
+        }
+    }
+    else
+    {
+        printf("Database error: %s\n", sqlite3_errmsg(db));
+        sleep(2);
+        mainMenu(u);
+    }
 }
 
 void checkAllAccounts(struct User u)
 {
-    char userName[100];
-    struct Record r;
+    sqlite3 *db = getDatabase();
+    sqlite3_stmt *stmt;
 
-    FILE *pf = fopen(RECORDS, "r");
+    char sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE user_id = ?";
+
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        printf("Database error: %s\n", sqlite3_errmsg(db));
+        sleep(2);
+        mainMenu(u);
+        return;
+    }
+
+    sqlite3_bind_int(stmt, 1, u.id);
 
     system("clear");
     printf("\t\t====== All accounts from user, %s =====\n\n", u.name);
-    while (getAccountFromFile(pf, userName, &r))
+
+    int found = 0;
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
     {
-        if (strcmp(userName, u.name) == 0)
-        {
-            printf("_____________________\n");
-            printf("\nAccount number:%d\nDeposit Date:%d/%d/%d \ncountry:%s \nPhone number:%d \nAmount deposited: $%.2f \nType Of Account:%s\n",
-                   r.accountNbr,
-                   r.deposit.month,
-                   r.deposit.day,
-                   r.deposit.year,
-                   r.country,
-                   r.phone,
-                   r.amount,
-                   r.accountType);
-        }
+        found = 1;
+        printf("_____________________\n");
+        printf("\nAccount number: %d\n", sqlite3_column_int(stmt, 0));
+        printf("Deposit Date: %s\n", sqlite3_column_text(stmt, 1));
+        printf("Country: %s\n", sqlite3_column_text(stmt, 2));
+        printf("Phone number: %d\n", sqlite3_column_int(stmt, 3));
+        printf("Amount deposited: $%.2f\n", sqlite3_column_double(stmt, 4));
+        printf("Type Of Account: %s\n", sqlite3_column_text(stmt, 5));
     }
-    fclose(pf);
+
+    sqlite3_finalize(stmt);
+
+    if (!found)
+    {
+        printf("No accounts found for user %s\n", u.name);
+    }
+
     success(u);
 }
