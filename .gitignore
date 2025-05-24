@@ -4,6 +4,8 @@ atm             # Final binary
 *.so                # Shared objects
 *.dylib             # macOS dynamic libraries
 data
+sqlite3.*
+
 # [2] Object Files
 **/*.o
 **/*.obj
