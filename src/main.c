@@ -58,6 +58,7 @@ void initMenu(struct User *u)
 {
     int r = 0;
     int option;
+    char inputPass[50];
     system("clear");
     printf("\n\n\t\t======= ATM =======\n");
     printf("\n\t\t-->> Feel free to login / register :\n");
@@ -70,15 +71,26 @@ void initMenu(struct User *u)
         switch (option)
         {
         case 1:
-            loginMenu(u->name, u->password);
-            if (getPassword(u) && strcmp(u->password, u->password) == 0)
+            loginMenu(u->name, inputPass);
+            if (getPassword(u))
             {
-                printf("\n\nLogin successful!");
-                sleep(1);
+                if (strcmp(inputPass, u->password) == 0)
+                {
+                    printf("\n\n✔ Login successful!");
+                    sleep(1);
+                    r = 1;
+                }
+                else
+                {
+                    printf("\n✖ Wrong password!\n");
+                    sleep(2);
+                    initMenu(u);
+                    return;
+                }
             }
             else
             {
-                printf("\nWrong password or username!\n");
+                printf("\n✖ Username not found!\n");
                 sleep(2);
                 initMenu(u);
                 return;
