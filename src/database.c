@@ -149,3 +149,40 @@ int validateAccountType(char *accountType)
     printf("✖ Invalid account type");
     return 0;
 }
+
+// Validate name (no numbers, not empty)
+int validateName(char *name)
+{
+    if (!name || strlen(name) == 0)
+    {
+        printf("✖ Name cannot be null or empty\n");
+        return 0;
+    }
+
+    size_t len = strlen(name);
+    if (len < 2 || len > 26)
+    {
+        printf("✖ Name must be between 2 and 26 characters\n");
+        return 0;
+    }
+
+    // Must start with a letter
+    if (!isalpha((unsigned char)name[0]))
+    {
+        printf("✖ Name must start with a letter\n");
+        return 0;
+    }
+
+    for (size_t i = 0; i < len; i++)
+    {
+        char c = name[i];
+        // Allow letters, spaces, hyphens, underscores only
+        if (!(isalpha((unsigned char)c) || c == ' ' || c == '-' || c == '_'))
+        {
+            printf("✖ Invalid character '%c' in name\n", c);
+            return 0;
+        }
+    }
+
+    return 1; // Name is valid
+}
