@@ -186,3 +186,41 @@ int validateName(char *name)
 
     return 1; // Name is valid
 }
+
+// Validates local and international-style phone numbers
+int validatePhone(const char *phoneStr)
+{
+    size_t len = strlen(phoneStr);
+
+    if (len < 10 || len > 15)
+    {
+        printf("✖ Phone number must be between 10 and 15 digits long.\n");
+        return 0;
+    }
+
+    int start = 0;
+
+    // Allow optional leading '+' (but skip it in digit checks)
+    if (phoneStr[0] == '+')
+    {
+        start = 1;
+
+        if (len < 11 || len > 15)
+        { // + plus 10+ digits
+            printf("✖ International number must have 10 to 14 digits after '+'.\n");
+            return 0;
+        }
+    }
+
+    // Check that the rest are all digits
+    for (size_t i = start; i < len; i++)
+    {
+        if (!isdigit((unsigned char)phoneStr[i]))
+        {
+            printf("✖ Phone number must contain digits only%s.\n", start ? " after the '+'" : "");
+            return 0;
+        }
+    }
+
+    return 1; // Valid
+}
