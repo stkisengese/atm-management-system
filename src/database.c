@@ -1,4 +1,8 @@
 #include "header.h"
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
 
 static sqlite3 *db = NULL;
 
