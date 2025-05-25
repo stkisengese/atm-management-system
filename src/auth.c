@@ -132,3 +132,32 @@ int registerUser(char name[50], char password[50])
 
     return (rc == SQLITE_DONE) ? 1 : 0;
 }
+
+int validatePassword(const char *pass)
+{
+    if (!pass)
+    {
+        printf("\t\t\t\t✖ Password cannot be empty.\n");
+        return 0;
+    }
+
+    size_t len = strlen(pass);
+
+    if (len < 4 || len > 12)
+    {
+        printf("\t\t\t\t✖ Password must be between 4 and 12 characters long.\n");
+        return 0;
+    }
+
+    for (size_t i = 0; i < len; i++)
+    {
+        char c = pass[i];
+        if (!(isalnum((unsigned char)c) || c == '-' || c == '_'))
+        {
+            printf("\t\t\t\t✖ Password can only contain letters, numbers, '-' and '_'.\n");
+            return 0;
+        }
+    }
+
+    return 1; // ✅ Valid
+}
