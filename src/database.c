@@ -15,8 +15,8 @@ int initDatabase()
     // Create users table
     char *sql_users = "CREATE TABLE IF NOT EXISTS users ("
                       "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                      "name TEXT UNIQUE NOT NULL,"
-                      "password TEXT NOT NULL);";
+                      "name TEXT UNIQUE NOT NULL CHECK(LENGTH(name) > 2 AND name NOT GLOB '*[0-9]*'),"
+                      "password TEXT NOT NULL CHECK(LENGTH(password) >= 4 AND LENGTH(password) <= 49));";
 
     rc = sqlite3_exec(db, sql_users, 0, 0, 0);
     if (rc != SQLITE_OK)
@@ -28,14 +28,15 @@ int initDatabase()
     // Create records table
     char *sql_records = "CREATE TABLE IF NOT EXISTS records ("
                         "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                        "user_id INTEGER,"
-                        "user_name TEXT,"
-                        "account_id INTEGER,"
-                        "deposit_date TEXT,"
-                        "country TEXT,"
-                        "phone INTEGER,"
-                        "balance REAL,"
-                        "account_type TEXT,"
+                        "user_id INTEGER NOT NULL,"
+                        "user_name TEXT NOT NULL,"
+                        "account_id INTEGER NOT NULL,"
+                        "deposit_date TEXT NOT NULL CHECK(deposit_date GLOB '[0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9]'),"
+                        "country TEXT NOT NULL CHECK(LENGTH(country) > 0 AND country NOT GLOB '*[0-9]*'),"
+                        "phone TEXT NOT NULL CHECK(phone GLOB '+[0-9]*' OR phone GLOB '0[0-9]*'),"
+                        "balance REAL NOT NULL CHECK(balance >= 0),"
+                        "account_type TEXT NOT NULL CHECK(account_type IN ('saving', 'current', 'fixed01', 'fixed02', 'fixed03')),"
+                        "UNIQUE(user_id, account_id),"
                         "FOREIGN KEY(user_id) REFERENCES users(id));";
 
     rc = sqlite3_exec(db, sql_records, 0, 0, 0);
