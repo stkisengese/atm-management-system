@@ -1,5 +1,8 @@
 #include <termios.h>
 #include "header.h"
+#include <ctype.h>
+#include <unistd.h>
+#include <stdio.h>
 
 void loginMenu(char a[50], char pass[50])
 {
@@ -7,7 +10,7 @@ void loginMenu(char a[50], char pass[50])
 
     system("clear");
     printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Login:");
-    scanf("%s", a);
+    scanf("%49s", a);
 
     // disabling echo
     tcgetattr(fileno(stdin), &oflags);
@@ -21,7 +24,7 @@ void loginMenu(char a[50], char pass[50])
         exit(1);
     }
     printf("\n\n\n\n\n\t\t\t\tEnter the password to login:");
-    scanf("%s", pass);
+    scanf("%49s", pass);
 
     // restore terminal
     if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
@@ -34,31 +37,71 @@ void loginMenu(char a[50], char pass[50])
 void registerMenu(char a[50], char pass[50])
 {
     struct termios oflags, nflags;
+    char confirmPass[50];
 
-    system("clear");
-    printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Registration:");
-    printf("\n\t\t\t\tEnter username:");
-    scanf("%s", a);
-
-    // disabling echo
-    tcgetattr(fileno(stdin), &oflags);
-    nflags = oflags;
-    nflags.c_lflag &= ~ECHO;
-    nflags.c_lflag |= ECHONL;
-
-    if (tcsetattr(fileno(stdin), TCSANOW, &nflags) != 0)
+    // ---------- Loop for Valid Username ----------
+    while (1)
     {
-        perror("tcsetattr");
-        exit(1);
+        system("clear");
+        printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Registration:");
+
+        printf("\n\t\t\t\tEnter username: ");
+        scanf("%49s", a);
+
+        if (!validateName(a))
+        {
+            sleep(2);
+            continue;
+        }
+
+        break; // username is valid
     }
-    printf("\n\n\n\n\n\t\t\t\tEnter password:");
-    scanf("%s", pass);
 
-    // restore terminal
-    if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
+    // ---------- Loop for Valid Password ----------
+    while (1)
     {
-        perror("tcsetattr");
-        exit(1);
+        // Disable echo for secure password input
+        tcgetattr(fileno(stdin), &oflags);
+        nflags = oflags;
+        nflags.c_lflag &= ~ECHO;
+        nflags.c_lflag |= ECHONL;
+
+        if (tcsetattr(fileno(stdin), TCSANOW, &nflags) != 0)
+        {
+            perror("tcsetattr");
+            exit(1);
+        }
+
+        printf("\n\t\t\t\tEnter password: ");
+        scanf("%49s", pass);
+
+        if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
+        {
+            perror("tcsetattr");
+            exit(1);
+        }
+
+        if (!validatePassword(pass))
+        {
+            sleep(2);
+            continue;
+        }
+
+        // ---------- Confirm Password ----------
+        // Disable echo again
+        tcsetattr(fileno(stdin), TCSANOW, &nflags);
+        printf("\n\t\t\t\tRe-enter password: ");
+        scanf("%49s", confirmPass);
+        tcsetattr(fileno(stdin), TCSANOW, &oflags);
+
+        if (strcmp(pass, confirmPass) != 0)
+        {
+            printf("\n\t\t\t\t✖ Passwords do not match. Try again.\n");
+            sleep(2);
+            continue;
+        }
+
+        break; // password is valid and confirmed
     }
 }
 
