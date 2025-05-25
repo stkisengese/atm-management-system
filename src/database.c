@@ -126,3 +126,26 @@ int validateDate(int month, int day, int year)
 
     return 1; // ✅ All checks passed
 }
+
+// Validate account type
+int validateAccountType(char *accountType)
+{
+    if (!accountType || strlen(accountType) == 0)
+    {
+        printf("✖ Account type cannot be empty\n");
+        return 0;
+    }
+
+    char validTypes[][10] = {"saving", "current", "fixed01", "fixed02", "fixed03"};
+    int numTypes = sizeof(validTypes) / sizeof(validTypes[0]);
+
+    for (int i = 0; i < numTypes; i++)
+    {
+        if (strcmp(accountType, validTypes[i]) == 0)
+        {
+            return 1;
+        }
+    }
+    printf("✖ Invalid account type");
+    return 0;
+}
