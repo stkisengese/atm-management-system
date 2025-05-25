@@ -78,59 +78,118 @@ void createNewAcc(struct User u)
     struct Record r;
     sqlite3 *db = getDatabase();
     sqlite3_stmt *stmt;
+    char input[100];
 
-noAccount:
     system("clear");
     printf("\t\t\t===== New record =====\n");
 
-    printf("\nEnter today's date(mm/dd/yyyy):");
-    scanf("%d/%d/%d", &r.deposit.month, &r.deposit.day, &r.deposit.year);
-    printf("\nEnter the account number:");
-    scanf("%d", &r.accountNbr);
-
-    // Check if account already exists for this user
-    char check_sql[] = "SELECT COUNT(*) FROM records WHERE user_id = ? AND account_id = ?";
-    int rc = sqlite3_prepare_v2(db, check_sql, -1, &stmt, NULL);
-    if (rc == SQLITE_OK)
+    // Validate date input
+    int isValidDate = 0;
+    do
     {
-        sqlite3_bind_int(stmt, 1, u.id);
-        sqlite3_bind_int(stmt, 2, r.accountNbr);
+        printf("\nEnter today's date(mm/dd/yyyy): ");
+        scanf("%d/%d/%d", &r.deposit.month, &r.deposit.day, &r.deposit.year);
 
-        rc = sqlite3_step(stmt);
-        if (rc == SQLITE_ROW && sqlite3_column_int(stmt, 0) > 0)
-        {
-            printf("✖ This Account already exists for this user\n\n");
-            sqlite3_finalize(stmt);
+        isValidDate = validateDate(r.deposit.month, r.deposit.day, r.deposit.year);
+        if (!isValidDate)
             sleep(2);
-            goto noAccount;
-        }
-        sqlite3_finalize(stmt);
-    }
+    } while (!isValidDate);
 
-    printf("\nEnter the country:");
-    scanf("%s", r.country);
-    printf("\nEnter the phone number:");
-    scanf("%d", &r.phone);
-    printf("\nEnter amount to deposit: $");
-    scanf("%lf", &r.amount);
-    printf("\nChoose the type of account:\n\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n\n\tEnter your choice:");
-    scanf("%s", r.accountType);
+    // Validate account number input
+    do
+    {
+        printf("\nEnter the account number: ");
+        scanf("%s", input);
+
+        if (!validateAccountNumber(input))
+        {
+            sleep(2);
+            continue;
+        }
+
+        // convert to intenger
+        r.accountNbr = atoi(input);
+
+        // Check if account already exists for this user
+        if (accountExists(r.accountNbr))
+        {
+            printf("✖ This Account is already in use. Please choose a differnt one.\n");
+            sleep(2);
+            continue;
+        }
+
+        break;
+    } while (1);
+
+    // Validate country input
+    do
+    {
+        printf("\nEnter the country: ");
+        scanf("%s", r.country);
+
+        if (!validateName(r.country))
+            sleep(2);
+    } while (!validateName(r.country));
+
+    // Validate phone number input
+    do
+    {
+        printf("\nEnter the phone number: ");
+        scanf("%s", input);
+
+        if (!validatePhone(input))
+        {
+            sleep(2);
+            continue;
+        }
+
+        strcpy(r.phone, input); // store phone as string
+        break;
+    } while (1);
+
+    // Validate amount input
+    do
+    {
+        printf("\nEnter amount to deposit: $");
+        scanf("%s", input);
+
+        if (!validateAmount(input))
+        {
+            sleep(2);
+            continue;
+        }
+
+        r.amount = atof(input);
+        break;
+    } while (1);
+
+    // Validate account type input
+    do
+    {
+        printf("\nChoose the type of account:\n");
+        printf("\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n");
+        printf("\nEnter your choice: ");
+        scanf("%s", r.accountType);
+
+        if (!validateAccountType(r.accountType))
+            sleep(2);
+    } while (!validateAccountType(r.accountType));
 
     // Insert new account record
     char insert_sql[] = "INSERT INTO records (user_id, user_name, account_id, deposit_date, country, phone, balance, account_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    rc = sqlite3_prepare_v2(db, insert_sql, -1, &stmt, NULL);
+    int rc = sqlite3_prepare_v2(db, insert_sql, -1, &stmt, NULL);
 
     if (rc == SQLITE_OK)
     {
         char date_str[20];
-        sprintf(date_str, "%d/%d/%d", r.deposit.month, r.deposit.day, r.deposit.year);
+        sprintf(date_str, "%02d/%02d/%04d", r.deposit.month, r.deposit.day, r.deposit.year);
 
         sqlite3_bind_int(stmt, 1, u.id);
         sqlite3_bind_text(stmt, 2, u.name, -1, SQLITE_STATIC);
         sqlite3_bind_int(stmt, 3, r.accountNbr);
         sqlite3_bind_text(stmt, 4, date_str, -1, SQLITE_STATIC);
         sqlite3_bind_text(stmt, 5, r.country, -1, SQLITE_STATIC);
-        sqlite3_bind_int(stmt, 6, r.phone);
+        sqlite3_bind_text(stmt, 6, r.phone, -1, SQLITE_STATIC);
         sqlite3_bind_double(stmt, 7, r.amount);
         sqlite3_bind_text(stmt, 8, r.accountType, -1, SQLITE_STATIC);
 
