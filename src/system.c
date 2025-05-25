@@ -1,4 +1,6 @@
 #include "header.h"
+#include <unistd.h>
+#include <stdio.h>
 
 void stayOrReturn(int notGood, void f(struct User u), struct User u)
 {
@@ -22,6 +24,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
         else
         {
             printf("Insert a valid operation!\n");
+            sleep(2);
             goto invalid;
         }
     }
@@ -38,6 +41,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
     else
     {
         system("clear");
+        printf("Thank you for using our ATM system!\n");
         closeDatabase();
         exit(0);
     }
@@ -57,12 +61,14 @@ invalid:
     }
     else if (option == 0)
     {
+        printf("Thank you for using our ATM system!\n");
         closeDatabase();
         exit(0);
     }
     else
     {
         printf("Insert a valid operation!\n");
+        sleep(2);
         goto invalid;
     }
 }
@@ -137,14 +143,14 @@ noAccount:
         }
         else
         {
-            printf("Error creating account: %s\n", sqlite3_errmsg(db));
-            sleep(2);
+            printf("✖ Error creating account: %s\n", sqlite3_errmsg(db));
+            sleep(3);
             mainMenu(u);
         }
     }
     else
     {
-        printf("Database error: %s\n", sqlite3_errmsg(db));
+        printf("✖ Database error: %s\n", sqlite3_errmsg(db));
         sleep(2);
         mainMenu(u);
     }
@@ -177,11 +183,11 @@ void checkAllAccounts(struct User u)
         found = 1;
         printf("_____________________\n");
         printf("\nAccount number: %d\n", sqlite3_column_int(stmt, 0));
-        printf("Deposit Date: %s\n", sqlite3_column_text(stmt, 1));
-        printf("Country: %s\n", sqlite3_column_text(stmt, 2));
-        printf("Phone number: %d\n", sqlite3_column_int(stmt, 3));
+        printf("Deposit Date    : %s\n", sqlite3_column_text(stmt, 1));
+        printf("Country         : %s\n", sqlite3_column_text(stmt, 2));
+        printf("Phone number    : %s\n", sqlite3_column_text(stmt, 3));
         printf("Amount deposited: $%.2f\n", sqlite3_column_double(stmt, 4));
-        printf("Type Of Account: %s\n", sqlite3_column_text(stmt, 5));
+        printf("Type Of Account : %s\n", sqlite3_column_text(stmt, 5));
     }
 
     sqlite3_finalize(stmt);
