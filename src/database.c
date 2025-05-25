@@ -66,3 +66,31 @@ void closeDatabase()
         db = NULL;
     }
 }
+
+// Check if account exists for a specific user
+int accountExists(int accountId)
+{
+    sqlite3 *database = getDatabase();
+    sqlite3_stmt *stmt;
+
+    char sql[] = "SELECT COUNT(*) FROM records WHERE account_id = ?";
+
+    int rc = sqlite3_prepare_v2(database, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "Failed to prepare account check statement: %s\n", sqlite3_errmsg(database));
+        return 0;
+    }
+
+    sqlite3_bind_int(stmt, 1, accountId);
+
+    rc = sqlite3_step(stmt);
+    int exists = 0;
+    if (rc == SQLITE_ROW)
+    {
+        exists = sqlite3_column_int(stmt, 0) > 0;
+    }
+
+    sqlite3_finalize(stmt);
+    return exists;
+}
