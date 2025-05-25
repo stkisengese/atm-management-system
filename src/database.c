@@ -263,3 +263,33 @@ int validateAmount(const char *amountStr)
 
     return 1; // Valid
 }
+
+// ValidateAccountNumber to digits only, positive intenger and 6-12 digits
+int validateAccountNumber(const char *acctNum)
+{
+    size_t len = strlen(acctNum);
+
+    if (len < 6 || len > 12)
+    {
+        printf("✖ Account number must be between 6 and 12 digits long.\n");
+        return 0;
+    }
+
+    for (size_t i = 0; i < len; i++)
+    {
+        if (!isdigit((unsigned char)acctNum[i]))
+        {
+            printf("✖ Account number must contain digits only.\n");
+            return 0;
+        }
+    }
+
+    // we reject account numbers starting with 0
+    if (acctNum[0] == '0')
+    {
+        printf("✖ Account number cannot start with 0.\n");
+        return 0;
+    }
+
+    return 1; // Valid
+}
