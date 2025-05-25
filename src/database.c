@@ -224,3 +224,42 @@ int validatePhone(const char *phoneStr)
 
     return 1; // Valid
 }
+
+// Validate amount string (only digits and decimal point)
+int validateAmount(const char *amountStr)
+{
+    if (!amountStr || strlen(amountStr) == 0)
+    {
+        printf("✖ Amount cannot be empty.\n");
+        return 0;
+    }
+
+    int dotSeen = 0;
+
+    for (size_t i = 0; amountStr[i] != '\0'; i++)
+    {
+        if (amountStr[i] == '.')
+        {
+            if (dotSeen)
+            {
+                printf("✖ Amount cannot contain more than one decimal point.\n");
+                return 0;
+            }
+            dotSeen = 1;
+        }
+        else if (!isdigit((unsigned char)amountStr[i]))
+        {
+            printf("✖ Amount must contain digits only (e.g., 100 or 99.50).\n");
+            return 0;
+        }
+    }
+
+    double value = atof(amountStr);
+    if (value <= 0)
+    {
+        printf("✖ Amount must be greater than zero.\n");
+        return 0;
+    }
+
+    return 1; // Valid
+}
