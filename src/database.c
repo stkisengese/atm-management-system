@@ -94,3 +94,35 @@ int accountExists(int accountId)
     sqlite3_finalize(stmt);
     return exists;
 }
+
+// Validate date format and values
+int validateDate(int month, int day, int year)
+{
+    if (year < 1900 || year > 2100)
+    {
+        printf("✖ Year must be between 1900 and 2100\n");
+        return 0;
+    }
+
+    if (month < 1 || month > 12)
+    {
+        printf("✖ Month must be between 1 and 12\n");
+        return 0;
+    }
+
+    int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+    // Adjust for leap year
+    if (month == 2 && ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)))
+    {
+        daysInMonth[1] = 29;
+    }
+
+    if (day < 1 || day > daysInMonth[month - 1])
+    {
+        printf("✖ Day %d is invalid for month %d\n", day, month);
+        return 0;
+    }
+
+    return 1; // ✅ All checks passed
+}
