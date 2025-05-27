@@ -14,7 +14,14 @@ void mainMenu(struct User u)
     printf("\n\t\t[6]- Remove existing account\n");
     printf("\n\t\t[7]- Transfer ownership\n");
     printf("\n\t\t[8]- Exit\n");
-    scanf("%d", &option);
+
+    if (!safeIntInput(&option, "\nEnter your choice: "))
+    {
+        printf("✖ Input error. Please try again!\n");
+        sleep(2);
+        mainMenu(u);
+        return;
+    }
 
     switch (option)
     {
@@ -49,7 +56,8 @@ void mainMenu(struct User u)
         exit(0);
         break;
     default:
-        printf("Invalid operation!\n");
+        printf("✖ Invalid operation! Please choose a number between 1-8.\n");
+        sleep(2);
         mainMenu(u);
     }
 };
