@@ -59,15 +59,23 @@ void initMenu(struct User *u)
     int r = 0;
     int option;
     char inputPass[50];
-    system("clear");
-    printf("\n\n\t\t======= ATM =======\n");
-    printf("\n\t\t-->> Feel free to login / register :\n");
-    printf("\n\t\t[1]- login\n");
-    printf("\n\t\t[2]- register\n");
-    printf("\n\t\t[3]- exit\n");
+
     while (!r)
     {
-        scanf("%d", &option);
+        system("clear");
+        printf("\n\n\t\t======= ATM =======\n");
+        printf("\n\t\t-->> Feel free to login / register :\n");
+        printf("\n\t\t[1]- login\n");
+        printf("\n\t\t[2]- register\n");
+        printf("\n\t\t[3]- exit\n");
+
+        if (!safeIntInput(&option, "\nEnter your choice: "))
+        {
+            printf("✖ Input error! Please try again.\n");
+            sleep(2);
+            continue;
+        }
+
         switch (option)
         {
         case 1:
@@ -84,16 +92,14 @@ void initMenu(struct User *u)
                 {
                     printf("\n✖ Wrong password!\n");
                     sleep(2);
-                    initMenu(u);
-                    return;
+                    continue;
                 }
             }
             else
             {
                 printf("\n✖ Username not found!\n");
                 sleep(2);
-                initMenu(u);
-                return;
+                continue;
             }
             r = 1;
             break;
@@ -103,15 +109,13 @@ void initMenu(struct User *u)
             registerMenu(temp_name, temp_pass);
             if (registerUser(temp_name, temp_pass))
             {
-                printf("\n\nRegistration successful! Please login.");
+                printf("\n\n✔ Registration successful! Please login.");
                 sleep(2);
-                initMenu(u);
             }
             else
             {
-                printf("\n\nRegistration failed! Username might already exist.");
+                printf("\n\n✖ Registration failed! Username might already exist.");
                 sleep(2);
-                initMenu(u);
             }
             return;
         }
@@ -120,7 +124,9 @@ void initMenu(struct User *u)
             exit(0);
             break;
         default:
-            printf("Insert a valid operation!\n");
+            printf("✖ Invalid operation! Please choose 1, 2, or 3.\n");
+            sleep(2);
+            continue;
         }
     }
 };
