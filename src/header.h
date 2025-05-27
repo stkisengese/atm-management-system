@@ -38,6 +38,11 @@ struct User
     char password[50];
 };
 
+// Input handling functions
+void clearInputBuffer();
+int safeStringInput(char *buffer, int size, const char *prompt);
+int safeIntInput(int *value, const char *prompt);
+
 // database functions
 int initDatabase();
 sqlite3 *getDatabase();
