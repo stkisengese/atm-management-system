@@ -31,10 +31,16 @@ void mainMenu(struct User u)
     case 2:
         // student TODO : add your **Update account information** function
         // here
+        printf("Feature not implemented yet.\n");
+        sleep(2);
+        mainMenu(u);
         break;
     case 3:
         // student TODO : add your **Check the details of existing accounts** function
         // here
+        printf("Feature not implemented yet.\n");
+        sleep(2);
+        mainMenu(u);
         break;
     case 4:
         checkAllAccounts(u);
@@ -42,14 +48,23 @@ void mainMenu(struct User u)
     case 5:
         // student TODO : add your **Make transaction** function
         // here
+        printf("Feature not implemented yet.\n");
+        sleep(2);
+        mainMenu(u);
         break;
     case 6:
         // student TODO : add your **Remove existing account** function
         // here
+        printf("Feature not implemented yet.\n");
+        sleep(2);
+        mainMenu(u);
         break;
     case 7:
         // student TODO : add your **Transfer owner** function
         // here
+        printf("Feature not implemented yet.\n");
+        sleep(2);
+        mainMenu(u);
         break;
     case 8:
         closeDatabase();
