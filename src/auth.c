@@ -1,18 +1,23 @@
-#include <termios.h>
 #include "header.h"
-#include <ctype.h>
-#include <unistd.h>
-#include <stdio.h>
-
 void loginMenu(char a[50], char pass[50])
 {
     struct termios oflags, nflags;
 
     system("clear");
-    printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Login:");
-    scanf("%49s", a);
+    // Single coordinated output for the header and username prompt
+    printf("\n\n\n\t\t\t\t   Bank Management System\n"
+           "\t\t\t\t\t User Login\n\n"
+           "\t\t\t\tEnter username: ");
+    fflush(stdout);
+    //  Get username
+    if (fgets(a, 50, stdin) == NULL)
+    {
+        printf("✖ Input error\n");
+        return;
+    }
+    a[strcspn(a, "\n")] = '\0'; // remove newline
 
-    // disabling echo
+    // disabling echo for password input
     tcgetattr(fileno(stdin), &oflags);
     nflags = oflags;
     nflags.c_lflag &= ~ECHO;
@@ -23,8 +28,17 @@ void loginMenu(char a[50], char pass[50])
         perror("tcsetattr");
         exit(1);
     }
-    printf("\n\n\n\n\n\t\t\t\tEnter the password to login:");
-    scanf("%49s", pass);
+
+    printf("\n\t\t\t\tEnter password: ");
+    fflush(stdout);
+    if (fgets(pass, 50, stdin) == NULL)
+    {
+        // Restore terminal settings on error
+        tcsetattr(fileno(stdin), TCSANOW, &oflags);
+        printf("✖ Input error\n");
+        return;
+    }
+    pass[strcspn(pass, "\n")] = '\0';
 
     // restore terminal
     if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
@@ -33,7 +47,6 @@ void loginMenu(char a[50], char pass[50])
         exit(1);
     }
 }
-
 void registerMenu(char a[50], char pass[50])
 {
     struct termios oflags, nflags;
@@ -45,8 +58,12 @@ void registerMenu(char a[50], char pass[50])
         system("clear");
         printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Registration:");
 
-        printf("\n\t\t\t\tEnter username: ");
-        scanf("%49s", a);
+        if (!safeStringInput(a, 50, "\n\t\t\t\tEnter username: "))
+        {
+            printf("✖ Input error. Please try again.\n");
+            sleep(2);
+            continue;
+        }
 
         if (!validateName(a))
         {
@@ -73,7 +90,12 @@ void registerMenu(char a[50], char pass[50])
         }
 
         printf("\n\t\t\t\tEnter password: ");
-        scanf("%49s", pass);
+        fflush(stdout);
+
+        if (fgets(pass, 50, stdin) != NULL)
+        { // Remove trailing newline if present
+            pass[strcspn(pass, "\n")] = '\0';
+        }
 
         if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
         {
@@ -91,7 +113,12 @@ void registerMenu(char a[50], char pass[50])
         // Disable echo again
         tcsetattr(fileno(stdin), TCSANOW, &nflags);
         printf("\n\t\t\t\tRe-enter password: ");
-        scanf("%49s", confirmPass);
+        fflush(stdout);
+
+        if (fgets(confirmPass, 50, stdin) != NULL)
+        { // Remove trailing newline if present
+            confirmPass[strcspn(confirmPass, "\n")] = '\0';
+        }
         tcsetattr(fileno(stdin), TCSANOW, &oflags);
 
         if (strcmp(pass, confirmPass) != 0)
