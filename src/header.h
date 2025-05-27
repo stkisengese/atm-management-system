@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <termios.h>
+#include <limits.h>
+#include <ctype.h>
 #include "../sqlite/sqlite3.h"
 
 // Date structure
