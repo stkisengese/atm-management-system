@@ -485,3 +485,54 @@ void updateAccountInfo(struct User u)
         mainMenu(u);
     }
 }
+
+void checkAccountDetails(struct User u)
+{
+    sqlite3 *db = getDatabase();
+    sqlite3_stmt *stmt;
+    int accountId;
+
+    system("clear");
+    printf("\t\t\t===== Check Account Details =====\n");
+
+    printf("Enter the account ID to check: ");
+    scanf("%d", &accountId);
+
+    char sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE account_id = ? AND user_id = ?";
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+
+    if (rc != SQLITE_OK)
+    {
+        printf("Database error: %s\n", sqlite3_errmsg(db));
+        sleep(2);
+        mainMenu(u);
+        return;
+    }
+
+    sqlite3_bind_int(stmt, 1, accountId);
+    sqlite3_bind_int(stmt, 2, u.id);
+
+    rc = sqlite3_step(stmt);
+    if (rc == SQLITE_ROW)
+    {
+        printf("\n========== Account Details ==========\n");
+        printf("Account Number  : %d\n", sqlite3_column_int(stmt, 0));
+        printf("Deposit Date    : %s\n", sqlite3_column_text(stmt, 1));
+        printf("Country         : %s\n", sqlite3_column_text(stmt, 2));
+        printf("Phone Number    : %s\n", sqlite3_column_text(stmt, 3));
+        printf("Balance         : $%.2f\n", sqlite3_column_double(stmt, 4));
+        printf("Account Type    : %s\n", sqlite3_column_text(stmt, 5));
+
+        const char *accountType = (const char *)sqlite3_column_text(stmt, 5);
+        double balance = sqlite3_column_double(stmt, 4);
+        const char *depositDate = (const char *)sqlite3_column_text(stmt, 1);
+        displayInterestInfo(accountType, balance, depositDate);
+        sqlite3_finalize(stmt);
+        success(u);
+    }
+    else
+    {
+        sqlite3_finalize(stmt);
+        stayOrReturn(0, checkAccountDetails, u);
+    }
+}
