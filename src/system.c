@@ -847,10 +847,93 @@ void makeTransaction(struct User u)
     }
 }
 
-// Helper function to check if account is fixed type
-int isFixedAccount(const char *accountType)
+void removeAccount(struct User u)
 {
-    return (strcmp(accountType, "fixed01") == 0 ||
-            strcmp(accountType, "fixed02") == 0 ||
-            strcmp(accountType, "fixed03") == 0);
+    sqlite3 *db = getDatabase();
+    sqlite3_stmt *stmt;
+    int accountId;
+    char confirmation[10];
+
+    system("clear");
+    printf("\t\t\t===== Remove Account =====\n");
+
+    // Show user's accounts first
+    char list_sql[] = "SELECT account_id, balance, account_type FROM records WHERE user_id = ?";
+    int rc = sqlite3_prepare_v2(db, list_sql, -1, &stmt, NULL);
+    sqlite3_bind_int(stmt, 1, u.id);
+
+    printf("Your accounts:\n");
+    int found = 0;
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
+    {
+        found = 1;
+        printf("Account ID: %d, Balance: $%.2f, Type: %s\n",
+               sqlite3_column_int(stmt, 0),
+               sqlite3_column_double(stmt, 1),
+               sqlite3_column_text(stmt, 2));
+    }
+    sqlite3_finalize(stmt);
+
+    if (!found)
+    {
+        printf("No accounts found!\n");
+        sleep(2);
+        mainMenu(u);
+        return;
+    }
+
+    printf("\nEnter account ID to remove: ");
+    scanf("%d", &accountId);
+
+    // Verify account exists and belongs to user
+    char verify_sql[] = "SELECT balance FROM records WHERE account_id = ? AND user_id = ?";
+    rc = sqlite3_prepare_v2(db, verify_sql, -1, &stmt, NULL);
+    sqlite3_bind_int(stmt, 1, accountId);
+    sqlite3_bind_int(stmt, 2, u.id);
+
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_ROW)
+    {
+        sqlite3_finalize(stmt);
+        printf("✖ Account not found!\n");
+        sleep(2);
+        stayOrReturn(0, removeAccount, u);
+        return;
+    }
+
+    double balance = sqlite3_column_double(stmt, 0);
+    sqlite3_finalize(stmt);
+
+    printf("⚠️  WARNING: This will permanently delete account %d with balance $%.2f\n", accountId, balance);
+    printf("Type 'YES' to confirm deletion: ");
+    scanf("%s", confirmation);
+
+    if (strcmp(confirmation, "YES") != 0)
+    {
+        printf("Account deletion cancelled.\n");
+        sleep(2);
+        mainMenu(u);
+        return;
+    }
+
+    // Delete the account
+    char delete_sql[] = "DELETE FROM records WHERE account_id = ? AND user_id = ?";
+    rc = sqlite3_prepare_v2(db, delete_sql, -1, &stmt, NULL);
+    sqlite3_bind_int(stmt, 1, accountId);
+    sqlite3_bind_int(stmt, 2, u.id);
+
+    rc = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    if (rc == SQLITE_DONE)
+    {
+        printf("✔ Account %d has been successfully deleted!\n", accountId);
+        success(u);
+    }
+    else
+    {
+        printf("✖ Error deleting account: %s\n", sqlite3_errmsg(db));
+        sleep(2);
+        mainMenu(u);
+    }
 }
