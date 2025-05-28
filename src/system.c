@@ -603,3 +603,130 @@ void checkAccountDetails(struct User u)
         mainMenu(u);
     }
 }
+
+void makeTransaction(struct User u)
+{
+    sqlite3 *db = getDatabase();
+    sqlite3_stmt *stmt;
+    int accountId;
+    int transactionType;
+    char amountStr[50];
+    double amount;
+    double currentBalance;
+    char accountType[20];
+
+    system("clear");
+    printf("\t\t\t===== Make Transaction =====\n");
+
+    printf("Enter account ID: ");
+    scanf("%d", &accountId);
+
+    // Get account details
+    char get_sql[] = "SELECT balance, account_type FROM records WHERE account_id = ? AND user_id = ?";
+    int rc = sqlite3_prepare_v2(db, get_sql, -1, &stmt, NULL);
+    sqlite3_bind_int(stmt, 1, accountId);
+    sqlite3_bind_int(stmt, 2, u.id);
+
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_ROW)
+    {
+        sqlite3_finalize(stmt);
+        printf("✖ Account not found!\n");
+        sleep(2);
+        stayOrReturn(0, makeTransaction, u);
+        return;
+    }
+
+    currentBalance = sqlite3_column_double(stmt, 0);
+    strcpy(accountType, (char *)sqlite3_column_text(stmt, 1));
+    sqlite3_finalize(stmt);
+
+    // Check if account is fixed type
+    if (isFixedAccount(accountType))
+    {
+        printf("✖ Transactions are not allowed on fixed accounts (fixed01, fixed02, fixed03)!\n");
+        sleep(3);
+        mainMenu(u);
+        return;
+    }
+
+    printf("Current balance: $%.2f\n", currentBalance);
+    printf("\nTransaction type:\n");
+    printf("1. Deposit\n");
+    printf("2. Withdraw\n");
+    printf("Enter choice (1 or 2): ");
+    scanf("%d", &transactionType);
+
+    if (transactionType != 1 && transactionType != 2)
+    {
+        printf("✖ Invalid transaction type!\n");
+        sleep(2);
+        makeTransaction(u);
+        return;
+    }
+
+    do
+    {
+        printf("Enter amount: $");
+        scanf("%s", amountStr);
+
+        if (!validateAmount(amountStr))
+        {
+            sleep(2);
+            continue;
+        }
+
+        amount = atof(amountStr);
+        break;
+    } while (1);
+
+    double newBalance;
+    if (transactionType == 1) // Deposit
+    {
+        newBalance = currentBalance + amount;
+        printf("Depositing $%.2f...\n", amount);
+    }
+    else // Withdraw
+    {
+        if (amount > currentBalance)
+        {
+            printf("✖ Insufficient funds! Current balance: $%.2f\n", currentBalance);
+            sleep(3);
+            makeTransaction(u);
+            return;
+        }
+        newBalance = currentBalance - amount;
+        printf("Withdrawing $%.2f...\n", amount);
+    }
+
+    // Update balance
+    char update_sql[] = "UPDATE records SET balance = ? WHERE account_id = ? AND user_id = ?";
+    rc = sqlite3_prepare_v2(db, update_sql, -1, &stmt, NULL);
+    sqlite3_bind_double(stmt, 1, newBalance);
+    sqlite3_bind_int(stmt, 2, accountId);
+    sqlite3_bind_int(stmt, 3, u.id);
+
+    rc = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    if (rc == SQLITE_DONE)
+    {
+        printf("✔ Transaction completed successfully!\n");
+        printf("New balance: $%.2f\n", newBalance);
+        success(u);
+    }
+    else
+    {
+        printf("✖ Transaction failed: %s\n", sqlite3_errmsg(db));
+        sleep(2);
+        mainMenu(u);
+    }
+}
+
+// Helper function to check if account is fixed type
+int isFixedAccount(const char *accountType)
+{
+    return (strcmp(accountType, "fixed01") == 0 ||
+            strcmp(accountType, "fixed02") == 0 ||
+            strcmp(accountType, "fixed03") == 0);
+}
