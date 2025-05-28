@@ -851,26 +851,44 @@ void removeAccount(struct User u)
 {
     sqlite3 *db = getDatabase();
     sqlite3_stmt *stmt;
-    int accountId;
+    int accountChoice;
     char confirmation[10];
+    int accountIds[100]; // Array to store account IDs
+    int accountCount = 0;
 
     system("clear");
     printf("\t\t\t===== Remove Account =====\n");
 
-    // Show user's accounts first
-    char list_sql[] = "SELECT account_id, balance, account_type FROM records WHERE user_id = ?";
+    // First, show user's accounts with selection numbers
+    char list_sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE user_id = ?";
     int rc = sqlite3_prepare_v2(db, list_sql, -1, &stmt, NULL);
+
+    if (rc != SQLITE_OK)
+    {
+        printf("Database error: %s\n", sqlite3_errmsg(db));
+        sleep(2);
+        mainMenu(u);
+        return;
+    }
+
     sqlite3_bind_int(stmt, 1, u.id);
 
-    printf("Your accounts:\n");
+    printf("\nYour accounts:\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+
     int found = 0;
-    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && accountCount < 100)
     {
         found = 1;
-        printf("Account ID: %d, Balance: $%.2f, Type: %s\n",
-               sqlite3_column_int(stmt, 0),
-               sqlite3_column_double(stmt, 1),
-               sqlite3_column_text(stmt, 2));
+        accountCount++;
+        accountIds[accountCount - 1] = sqlite3_column_int(stmt, 0); // Store account ID
+
+        printf("[%d] Account ID: %d (%s)\n", accountCount, accountIds[accountCount - 1],
+               sqlite3_column_text(stmt, 5)); // Show account type
+        printf("    Balance: $%.2f\n", sqlite3_column_double(stmt, 4));
+        printf("    Country: %s | Phone: %s\n",
+               sqlite3_column_text(stmt, 2), sqlite3_column_text(stmt, 3));
+        printf("───────────────────────────────────────────────────────────────\n");
     }
     sqlite3_finalize(stmt);
 
@@ -882,13 +900,40 @@ void removeAccount(struct User u)
         return;
     }
 
-    printf("\nEnter account ID to remove: ");
-    scanf("%d", &accountId);
+    // Get user's account selection
+    do
+    {
+        if (!safeIntInput(&accountChoice, "\nSelect account to remove (enter the number): "))
+        {
+            printf("✖ Invalid input! Please try again.\n");
+            sleep(2);
+            continue;
+        }
 
-    // Verify account exists and belongs to user
-    char verify_sql[] = "SELECT balance FROM records WHERE account_id = ? AND user_id = ?";
-    rc = sqlite3_prepare_v2(db, verify_sql, -1, &stmt, NULL);
-    sqlite3_bind_int(stmt, 1, accountId);
+        if (accountChoice < 1 || accountChoice > accountCount)
+        {
+            printf("✖ Invalid selection! Please choose a number between 1 and %d.\n", accountCount);
+            sleep(2);
+            continue;
+        }
+        break;
+    } while (1);
+
+    int selectedAccountId = accountIds[accountChoice - 1];
+
+    // Get detailed account information for confirmation
+    char detail_sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE account_id = ? AND user_id = ?";
+    rc = sqlite3_prepare_v2(db, detail_sql, -1, &stmt, NULL);
+
+    if (rc != SQLITE_OK)
+    {
+        printf("Database error: %s\n", sqlite3_errmsg(db));
+        sleep(2);
+        mainMenu(u);
+        return;
+    }
+
+    sqlite3_bind_int(stmt, 1, selectedAccountId);
     sqlite3_bind_int(stmt, 2, u.id);
 
     rc = sqlite3_step(stmt);
@@ -901,25 +946,97 @@ void removeAccount(struct User u)
         return;
     }
 
-    double balance = sqlite3_column_double(stmt, 0);
+    // Display account details for confirmation
+    system("clear");
+    printf("\t\t\t===== Remove Account =====\n");
+    printf("\n⚠️  WARNING: Account Deletion Confirmation\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+    printf("Account Number : %d\n", sqlite3_column_int(stmt, 0));
+    printf("Deposit Date   : %s\n", sqlite3_column_text(stmt, 1));
+    printf("Country        : %s\n", sqlite3_column_text(stmt, 2));
+    printf("Phone Number   : %s\n", sqlite3_column_text(stmt, 3));
+    printf("Balance        : $%.2f\n", sqlite3_column_double(stmt, 4));
+    printf("Account Type   : %s\n", sqlite3_column_text(stmt, 5));
+    printf("═══════════════════════════════════════════════════════════════\n");
+
+    double balance = sqlite3_column_double(stmt, 4);
     sqlite3_finalize(stmt);
 
-    printf("⚠️  WARNING: This will permanently delete account %d with balance $%.2f\n", accountId, balance);
-    printf("Type 'YES' to confirm deletion: ");
-    scanf("%s", confirmation);
+    printf("\n🚨 CRITICAL WARNING:\n");
+    printf("• This action will PERMANENTLY delete this account\n");
+    printf("• Account balance of $%.2f will be LOST\n", balance);
+    printf("• This action CANNOT be undone\n");
+    printf("• All account history will be removed\n");
 
-    if (strcmp(confirmation, "YES") != 0)
+    printf("\n═══════════════════════════════════════════════════════════════\n");
+    printf("Deletion Confirmation:\n");
+    printf("[1] Proceed with deletion\n");
+    printf("[2] Cancel and return to main menu\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+
+    int deleteChoice;
+    do
     {
-        printf("Account deletion cancelled.\n");
+        if (!safeIntInput(&deleteChoice, "\nEnter your choice (1 or 2): "))
+        {
+            printf("✖ Invalid input! Please try again.\n");
+            sleep(2);
+            continue;
+        }
+
+        if (deleteChoice == 2)
+        {
+            printf("\n✔ Account deletion cancelled. Returning to main menu...\n");
+            sleep(2);
+            mainMenu(u);
+            return;
+        }
+        else if (deleteChoice != 1)
+        {
+            printf("✖ Invalid choice! Please enter 1 to proceed or 2 to cancel.\n");
+            sleep(2);
+            continue;
+        }
+        break;
+    } while (1);
+
+    // Final confirmation with text input
+    printf("\n--- Final Security Confirmation ---\n");
+    do
+    {
+        if (!safeStringInput(confirmation, sizeof(confirmation), "Type 'DELETE' to confirm permanent deletion: "))
+        {
+            printf("✖ Input error! Please try again.\n");
+            sleep(2);
+            continue;
+        }
+
+        if (strcmp(confirmation, "DELETE") != 0)
+        {
+            printf("✖ Confirmation failed! You must type 'DELETE' exactly.\n");
+            printf("Account deletion cancelled. Returning to main menu...\n");
+            sleep(3);
+            mainMenu(u);
+            return;
+        }
+        break;
+    } while (1);
+
+    // Proceed with deletion
+    printf("\n→ Processing account deletion...\n");
+
+    char delete_sql[] = "DELETE FROM records WHERE account_id = ? AND user_id = ?";
+    rc = sqlite3_prepare_v2(db, delete_sql, -1, &stmt, NULL);
+
+    if (rc != SQLITE_OK)
+    {
+        printf("✖ Database error: %s\n", sqlite3_errmsg(db));
         sleep(2);
         mainMenu(u);
         return;
     }
 
-    // Delete the account
-    char delete_sql[] = "DELETE FROM records WHERE account_id = ? AND user_id = ?";
-    rc = sqlite3_prepare_v2(db, delete_sql, -1, &stmt, NULL);
-    sqlite3_bind_int(stmt, 1, accountId);
+    sqlite3_bind_int(stmt, 1, selectedAccountId);
     sqlite3_bind_int(stmt, 2, u.id);
 
     rc = sqlite3_step(stmt);
@@ -927,13 +1044,21 @@ void removeAccount(struct User u)
 
     if (rc == SQLITE_DONE)
     {
-        printf("✔ Account %d has been successfully deleted!\n", accountId);
+        system("clear");
+        printf("\t\t\t===== Account Deletion Complete =====\n");
+        printf("\n✔ SUCCESS: Account has been permanently deleted!\n");
+        printf("\n═══════════════ Deletion Summary ═══════════════\n");
+        printf("Deleted Account ID: %d\n", selectedAccountId);
+        printf("Previous Balance  : $%.2f\n", balance);
+        printf("Status           : Permanently Removed\n");
+        printf("═══════════════════════════════════════════════\n");
+
         success(u);
     }
     else
     {
         printf("✖ Error deleting account: %s\n", sqlite3_errmsg(db));
-        sleep(2);
-        mainMenu(u);
+        sleep(3);
+        stayOrReturn(0, removeAccount, u);
     }
 }
