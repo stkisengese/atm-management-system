@@ -161,6 +161,7 @@ void createNewAcc(struct User u)
         break;
     } while (1);
 
+    int isValid = 0;
     // Validate country input
     do
     {
@@ -171,9 +172,10 @@ void createNewAcc(struct User u)
             continue;
         }
 
-        if (!validateName(r.country))
+        isValid = validateName(r.country);
+        if (!isValid)
             sleep(2);
-    } while (!validateName(r.country));
+    } while (!isValid);
 
     // Validate phone number input
     do
