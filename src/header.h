@@ -67,4 +67,14 @@ void createNewAcc(struct User u);
 void mainMenu(struct User u);
 void checkAllAccounts(struct User u);
 
+// transaction functions
+void updateAccountInfo(struct User u);
+void checkAccountDetails(struct User u);
+void makeTransaction(struct User u);
+void removeAccount(struct User u);
+void checkAccountDetails(struct User u);
+void transferOwnership(struct User u);
+int isFixedAccount(const char *accountType);
+void displayInterestInfo(const char *accountType, double balance, const char *depositDate);
+
 #endif // HEADER_H
