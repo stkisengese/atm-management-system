@@ -32,11 +32,7 @@ void mainMenu(struct User u)
         updateAccountInfo(u);
         break;
     case 3:
-        // student TODO : add your **Check the details of existing accounts** function
-        // here
-        printf("Feature not implemented yet.\n");
-        sleep(2);
-        mainMenu(u);
+        checkAccountDetails(u);
         break;
     case 4:
         checkAllAccounts(u);
