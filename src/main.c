@@ -44,11 +44,7 @@ void mainMenu(struct User u)
         removeAccount(u);
         break;
     case 7:
-        // student TODO : add your **Transfer owner** function
-        // here
-        printf("Feature not implemented yet.\n");
-        sleep(2);
-        mainMenu(u);
+        transferOwnership(u);
         break;
     case 8:
         closeDatabase();
