@@ -63,3 +63,35 @@ int safeIntInput(int *value, const char *prompt)
     *value = (int)temp;
     return 1;
 }
+
+// Helper function to display interest information
+void displayInterestInfo(const char* accountType, double balance, const char* depositDate)
+{
+    printf("\n========== Interest Information ==========\n");
+    
+    if (strcmp(accountType, "current") == 0)
+    {
+        printf("You will not get interests because the account is of type current\n");
+    }
+    else
+    {
+        double interestRate = 0.0;
+        if (strcmp(accountType, "saving") == 0)
+            interestRate = 0.07; // 7%
+        else if (strcmp(accountType, "fixed01") == 0)
+            interestRate = 0.04; // 4%
+        else if (strcmp(accountType, "fixed02") == 0)
+            interestRate = 0.05; // 5%
+        else if (strcmp(accountType, "fixed03") == 0)
+            interestRate = 0.08; // 8%
+
+        double monthlyInterest = (balance * interestRate) / 12;
+        
+        // Extract day from deposit date (format: mm/dd/yyyy)
+        int month, day, year;
+        sscanf(depositDate, "%d/%d/%d", &month, &day, &year);
+        
+        printf("Interest rate: %.1f%%\n", interestRate * 100);
+        printf("You will get $%.2f as interest on day %d of every month\n", monthlyInterest, day);
+    }
+}
