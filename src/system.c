@@ -1062,3 +1062,113 @@ void removeAccount(struct User u)
         stayOrReturn(0, removeAccount, u);
     }
 }
+
+void transferOwnership(struct User u)
+{
+    sqlite3 *db = getDatabase();
+    sqlite3_stmt *stmt;
+    int accountId;
+    char targetUsername[50];
+    int targetUserId;
+
+    system("clear");
+    printf("\t\t\t===== Transfer Account Ownership =====\n");
+
+    // Show user's accounts
+    char list_sql[] = "SELECT account_id, balance, account_type FROM records WHERE user_id = ?";
+    int rc = sqlite3_prepare_v2(db, list_sql, -1, &stmt, NULL);
+    sqlite3_bind_int(stmt, 1, u.id);
+
+    printf("Your accounts:\n");
+    int found = 0;
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
+    {
+        found = 1;
+        printf("Account ID: %d, Balance: $%.2f, Type: %s\n",
+               sqlite3_column_int(stmt, 0),
+               sqlite3_column_double(stmt, 1),
+               sqlite3_column_text(stmt, 2));
+    }
+    sqlite3_finalize(stmt);
+
+    if (!found)
+    {
+        printf("No accounts found!\n");
+        sleep(2);
+        mainMenu(u);
+        return;
+    }
+
+    printf("\nEnter account ID to transfer: ");
+    scanf("%d", &accountId);
+
+    // Verify account belongs to user
+    char verify_sql[] = "SELECT COUNT(*) FROM records WHERE account_id = ? AND user_id = ?";
+    rc = sqlite3_prepare_v2(db, verify_sql, -1, &stmt, NULL);
+    sqlite3_bind_int(stmt, 1, accountId);
+    sqlite3_bind_int(stmt, 2, u.id);
+
+    rc = sqlite3_step(stmt);
+    int accountExists = sqlite3_column_int(stmt, 0);
+    sqlite3_finalize(stmt);
+
+    if (accountExists == 0)
+    {
+        printf("✖ Account not found!\n");
+        sleep(2);
+        stayOrReturn(0, transferOwnership, u);
+        return;
+    }
+
+    printf("Enter username to transfer to: ");
+    scanf("%s", targetUsername);
+
+    // Find target user ID
+    char user_sql[] = "SELECT id FROM users WHERE name = ?";
+    rc = sqlite3_prepare_v2(db, user_sql, -1, &stmt, NULL);
+    sqlite3_bind_text(stmt, 1, targetUsername, -1, SQLITE_STATIC);
+
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_ROW)
+    {
+        sqlite3_finalize(stmt);
+        printf("✖ Target user '%s' not found!\n", targetUsername);
+        sleep(2);
+        transferOwnership(u);
+        return;
+    }
+
+    targetUserId = sqlite3_column_int(stmt, 0);
+    sqlite3_finalize(stmt);
+
+    if (targetUserId == u.id)
+    {
+        printf("✖ Cannot transfer account to yourself!\n");
+        sleep(2);
+        transferOwnership(u);
+        return;
+    }
+
+    // Transfer ownership
+    char transfer_sql[] = "UPDATE records SET user_id = ?, user_name = ? WHERE account_id = ? AND user_id = ?";
+    rc = sqlite3_prepare_v2(db, transfer_sql, -1, &stmt, NULL);
+    sqlite3_bind_int(stmt, 1, targetUserId);
+    sqlite3_bind_text(stmt, 2, targetUsername, -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 3, accountId);
+    sqlite3_bind_int(stmt, 4, u.id);
+
+    rc = sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    if (rc == SQLITE_DONE)
+    {
+        printf("✔ Account %d has been successfully transferred to %s!\n", accountId, targetUsername);
+        success(u);
+    }
+    else
+    {
+        printf("✖ Error transferring account: %s\n", sqlite3_errmsg(db));
+        sleep(2);
+        mainMenu(u);
+    }
+}
