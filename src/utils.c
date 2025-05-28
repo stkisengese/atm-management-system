@@ -130,3 +130,11 @@ void displayInterestInfo(const char *accountType, double balance, const char *de
 
     printf("═══════════════════════════════════════════════════════════════\n");
 }
+
+// Helper function to check if account is fixed type
+int isFixedAccount(const char *accountType)
+{
+    return (strcmp(accountType, "fixed01") == 0 ||
+            strcmp(accountType, "fixed02") == 0 ||
+            strcmp(accountType, "fixed03") == 0);
+}
