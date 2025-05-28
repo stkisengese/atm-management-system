@@ -1,6 +1,4 @@
 #include "header.h"
-#include <unistd.h>
-#include <stdio.h>
 
 void stayOrReturn(int notGood, void f(struct User u), struct User u)
 {
@@ -10,8 +8,13 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
         system("clear");
         printf("\n✖ Record not found!!\n");
     invalid:
-        printf("\nEnter 0 to try again, 1 to return to main menu and 2 to exit:");
-        scanf("%d", &option);
+        if (!safeIntInput(&option, "\nEnter 0 to try again, 1 to return to main menu and 2 to exit: "))
+        {
+            printf("✖ Invalid input! Please try again.\n");
+            sleep(2);
+            goto invalid;
+        }
+
         if (option == 0)
             f(u);
         else if (option == 1)
@@ -23,16 +26,21 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
         }
         else
         {
-            printf("Insert a valid operation!\n");
+            printf("✖ Invalid operation! Please choose 0, 1, or 2.\n");
             sleep(2);
             goto invalid;
         }
     }
     else
     {
-        printf("\nEnter 1 to go to the main menu and 0 to exit:");
-        scanf("%d", &option);
+        if (!safeIntInput(&option, "\nEnter 1 to go to the main menu and 0 to exit: "))
+        {
+            printf("✖ Invalid input! Returning to main menu.\n");
+            sleep(2);
+            option = 1;
+        }
     }
+
     if (option == 1)
     {
         system("clear");
@@ -52,8 +60,13 @@ void success(struct User u)
     int option;
     printf("\n✔ Success!\n\n");
 invalid:
-    printf("Enter 1 to go to the main menu and 0 to exit!\n");
-    scanf("%d", &option);
+    if (!safeIntInput(&option, "Enter 1 to go to the main menu and 0 to exit: "))
+    {
+        printf("✖ Invalid input! Please try again.\n");
+        sleep(2);
+        goto invalid;
+    }
+
     system("clear");
     if (option == 1)
     {
@@ -67,7 +80,7 @@ invalid:
     }
     else
     {
-        printf("Insert a valid operation!\n");
+        printf("✖ Invalid operation! Please choose 1 or 0.\n");
         sleep(2);
         goto invalid;
     }
@@ -87,8 +100,31 @@ void createNewAcc(struct User u)
     int isValidDate = 0;
     do
     {
-        printf("\nEnter today's date(mm/dd/yyyy): ");
-        scanf("%d/%d/%d", &r.deposit.month, &r.deposit.day, &r.deposit.year);
+        int month, day, year;
+        if (!safeIntInput(&month, "\nEnter today's month (mm): "))
+        {
+            printf("✖ Invalid input! Please try again.\n");
+            sleep(2);
+            continue;
+        }
+
+        if (!safeIntInput(&day, "Enter today's day (dd): "))
+        {
+            printf("✖ Invalid input! Please try again.\n");
+            sleep(2);
+            continue;
+        }
+
+        if (!safeIntInput(&year, "Enter today's year (yyyy): "))
+        {
+            printf("✖ Invalid input! Please try again.\n");
+            sleep(2);
+            continue;
+        }
+
+        r.deposit.month = month;
+        r.deposit.day = day;
+        r.deposit.year = year;
 
         isValidDate = validateDate(r.deposit.month, r.deposit.day, r.deposit.year);
         if (!isValidDate)
@@ -98,8 +134,12 @@ void createNewAcc(struct User u)
     // Validate account number input
     do
     {
-        printf("\nEnter the account number: ");
-        scanf("%s", input);
+        if (!safeStringInput(input, sizeof(input), "\nEnter the account number: "))
+        {
+            printf("✖ Input error! Please try again.\n");
+            sleep(2);
+            continue;
+        }
 
         if (!validateAccountNumber(input))
         {
@@ -107,13 +147,13 @@ void createNewAcc(struct User u)
             continue;
         }
 
-        // convert to intenger
+        // convert to integer
         r.accountNbr = atoi(input);
 
-        // Check if account already exists for this user
+        // Check if account already exists
         if (accountExists(r.accountNbr))
         {
-            printf("✖ This Account is already in use. Please choose a differnt one.\n");
+            printf("✖ This Account is already in use. Please choose a different one.\n");
             sleep(2);
             continue;
         }
@@ -124,8 +164,12 @@ void createNewAcc(struct User u)
     // Validate country input
     do
     {
-        printf("\nEnter the country: ");
-        scanf("%s", r.country);
+        if (!safeStringInput(r.country, sizeof(r.country), "\nEnter the country: "))
+        {
+            printf("✖ Input error! Please try again.\n");
+            sleep(2);
+            continue;
+        }
 
         if (!validateName(r.country))
             sleep(2);
@@ -134,8 +178,12 @@ void createNewAcc(struct User u)
     // Validate phone number input
     do
     {
-        printf("\nEnter the phone number: ");
-        scanf("%s", input);
+        if (!safeStringInput(input, sizeof(input), "\nEnter the phone number: "))
+        {
+            printf("✖ Input error! Please try again.\n");
+            sleep(2);
+            continue;
+        }
 
         if (!validatePhone(input))
         {
@@ -150,8 +198,12 @@ void createNewAcc(struct User u)
     // Validate amount input
     do
     {
-        printf("\nEnter amount to deposit: $");
-        scanf("%s", input);
+        if (!safeStringInput(input, sizeof(input), "\nEnter amount to deposit: $"))
+        {
+            printf("✖ Input error! Please try again.\n");
+            sleep(2);
+            continue;
+        }
 
         if (!validateAmount(input))
         {
@@ -167,9 +219,14 @@ void createNewAcc(struct User u)
     do
     {
         printf("\nChoose the type of account:\n");
-        printf("\t-> saving\n\t-> current\n\t-> fixed01(for 1 year)\n\t-> fixed02(for 2 years)\n\t-> fixed03(for 3 years)\n");
-        printf("\nEnter your choice: ");
-        scanf("%s", r.accountType);
+        printf("\t-> saving\n\t-> current\n\t-> fixed01\t(for 1 year)\n\t-> fixed02\t(for 2 years)\n\t-> fixed03 \t(for 3 years)\n");
+
+        if (!safeStringInput(r.accountType, sizeof(r.accountType), "\nEnter your choice: "))
+        {
+            printf("✖ Input error! Please try again.\n");
+            sleep(2);
+            continue;
+        }
 
         if (!validateAccountType(r.accountType))
             sleep(2);
