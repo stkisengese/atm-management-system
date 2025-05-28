@@ -65,33 +65,68 @@ int safeIntInput(int *value, const char *prompt)
 }
 
 // Helper function to display interest information
-void displayInterestInfo(const char* accountType, double balance, const char* depositDate)
+void displayInterestInfo(const char *accountType, double balance, const char *depositDate)
 {
-    printf("\n========== Interest Information ==========\n");
-    
+    printf("\n═════════════════════ Interest Information ════════════════════\n");
+
     if (strcmp(accountType, "current") == 0)
     {
         printf("You will not get interests because the account is of type current\n");
+        return;
+    }
+
+    double interestRate = 0.0;
+    int maturityYears = 0;
+
+    // Set interest rates and maturity periods
+    if (strcmp(accountType, "saving") == 0)
+    {
+        interestRate = 0.07; // 7% annual
+    }
+    else if (strcmp(accountType, "fixed01") == 0)
+    {
+        interestRate = 0.04; // 4% annual
+        maturityYears = 1;
+    }
+    else if (strcmp(accountType, "fixed02") == 0)
+    {
+        interestRate = 0.05; // 5% annual
+        maturityYears = 2;
+    }
+    else if (strcmp(accountType, "fixed03") == 0)
+    {
+        interestRate = 0.08; // 8% annual
+        maturityYears = 3;
+    }
+
+    // Extract date components from deposit date (format: mm/dd/yyyy)
+    int month, day, year;
+    sscanf(depositDate, "%d/%d/%d", &month, &day, &year);
+    printf("Interest rate: %.1f%% per annum\n", interestRate * 100);
+    if (strcmp(accountType, "saving") == 0)
+    {
+        // For saving accounts: monthly interest
+        double monthlyInterest = (balance * interestRate) / 12;
+        printf("You will get $%.2f as interest on day %d of every month\n",
+               monthlyInterest, day);
     }
     else
     {
-        double interestRate = 0.0;
-        if (strcmp(accountType, "saving") == 0)
-            interestRate = 0.07; // 7%
-        else if (strcmp(accountType, "fixed01") == 0)
-            interestRate = 0.04; // 4%
-        else if (strcmp(accountType, "fixed02") == 0)
-            interestRate = 0.05; // 5%
-        else if (strcmp(accountType, "fixed03") == 0)
-            interestRate = 0.08; // 8%
+        // For fixed accounts: compound interest at maturity
+        double maturityAmount = balance;
+        for (int i = 0; i < maturityYears; i++)
+        {
+            maturityAmount += maturityAmount * interestRate;
+        }
+        double totalInterest = maturityAmount - balance;
+        int maturityYear = year + maturityYears;
 
-        double monthlyInterest = (balance * interestRate) / 12;
-        
-        // Extract day from deposit date (format: mm/dd/yyyy)
-        int month, day, year;
-        sscanf(depositDate, "%d/%d/%d", &month, &day, &year);
-        
-        printf("Interest rate: %.1f%%\n", interestRate * 100);
-        printf("You will get $%.2f as interest on day %d of every month\n", monthlyInterest, day);
+        printf("Maturity Period: %d year(s)\n", maturityYears);
+        printf("Maturity Date: %02d/%02d/%04d\n", month, day, maturityYear);
+        printf("You will get $%.2f as interest on %02d/%02d/%04d\n",
+               totalInterest, month, day, maturityYear);
+        printf("Total Amount at Maturity: $%.2f\n", maturityAmount);
     }
+
+    printf("═══════════════════════════════════════════════════════════════\n");
 }
