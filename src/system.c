@@ -608,23 +608,83 @@ void makeTransaction(struct User u)
 {
     sqlite3 *db = getDatabase();
     sqlite3_stmt *stmt;
-    int accountId;
+    int accountChoice;
     int transactionType;
     char amountStr[50];
     double amount;
     double currentBalance;
     char accountType[20];
+    int accountIds[100]; // Array to store account IDs
+    int accountCount = 0;
 
     system("clear");
     printf("\t\t\t===== Make Transaction =====\n");
 
-    printf("Enter account ID: ");
-    scanf("%d", &accountId);
+    // First, show user's accounts with selection numbers
+    char list_sql[] = "SELECT account_id, balance, account_type FROM records WHERE user_id = ?";
+    int rc = sqlite3_prepare_v2(db, list_sql, -1, &stmt, NULL);
 
-    // Get account details
+    if (rc != SQLITE_OK)
+    {
+        printf("Database error: %s\n", sqlite3_errmsg(db));
+        sleep(2);
+        mainMenu(u);
+        return;
+    }
+
+    sqlite3_bind_int(stmt, 1, u.id);
+
+    printf("\nAvailable accounts for transactions:\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+
+    int found = 0;
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && accountCount < 100)
+    {
+        found = 1;
+        accountCount++;
+        accountIds[accountCount - 1] = sqlite3_column_int(stmt, 0); // Store account ID
+
+        printf("[%d] Account ID: %d (%s)\n", accountCount, accountIds[accountCount - 1],
+               sqlite3_column_text(stmt, 2)); // Show account type
+        printf("    Current Balance: $%.2f\n", sqlite3_column_double(stmt, 1));
+        printf("───────────────────────────────────────────────────────────────\n");
+    }
+    sqlite3_finalize(stmt);
+
+    if (!found)
+    {
+        printf("No accounts available for transactions!\n");
+        printf("Note: Fixed accounts (fixed01, fixed02, fixed03) do not allow transactions.\n");
+        sleep(3);
+        mainMenu(u);
+        return;
+    }
+
+    // Get user's account selection
+    do
+    {
+        if (!safeIntInput(&accountChoice, "\nSelect account for transaction (enter the number): "))
+        {
+            printf("✖ Invalid input! Please try again.\n");
+            sleep(2);
+            continue;
+        }
+
+        if (accountChoice < 1 || accountChoice > accountCount)
+        {
+            printf("✖ Invalid selection! Please choose a number between 1 and %d.\n", accountCount);
+            sleep(2);
+            continue;
+        }
+        break;
+    } while (1);
+
+    int selectedAccountId = accountIds[accountChoice - 1];
+
+    // Get selected account details
     char get_sql[] = "SELECT balance, account_type FROM records WHERE account_id = ? AND user_id = ?";
-    int rc = sqlite3_prepare_v2(db, get_sql, -1, &stmt, NULL);
-    sqlite3_bind_int(stmt, 1, accountId);
+    rc = sqlite3_prepare_v2(db, get_sql, -1, &stmt, NULL);
+    sqlite3_bind_int(stmt, 1, selectedAccountId);
     sqlite3_bind_int(stmt, 2, u.id);
 
     rc = sqlite3_step(stmt);
@@ -633,7 +693,7 @@ void makeTransaction(struct User u)
         sqlite3_finalize(stmt);
         printf("✖ Account not found!\n");
         sleep(2);
-        stayOrReturn(0, makeTransaction, u);
+        mainMenu(u);
         return;
     }
 
@@ -650,25 +710,48 @@ void makeTransaction(struct User u)
         return;
     }
 
-    printf("Current balance: $%.2f\n", currentBalance);
-    printf("\nTransaction type:\n");
-    printf("1. Deposit\n");
-    printf("2. Withdraw\n");
-    printf("Enter choice (1 or 2): ");
-    scanf("%d", &transactionType);
+    // Display selected account info
+    system("clear");
+    printf("\t\t\t===== Make Transaction =====\n");
+    printf("\n✔ Selected Account ID: %d (%s)\n", selectedAccountId, accountType);
+    printf("Current Balance: $%.2f\n", currentBalance);
 
-    if (transactionType != 1 && transactionType != 2)
-    {
-        printf("✖ Invalid transaction type!\n");
-        sleep(2);
-        makeTransaction(u);
-        return;
-    }
+    // Transaction type selection
+    printf("\n═══════════════════════════════════════════════════════════════\n");
+    printf("Transaction Options:\n");
+    printf("[1] Deposit Money\n");
+    printf("[2] Withdraw Money\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
 
     do
     {
-        printf("Enter amount: $");
-        scanf("%s", amountStr);
+        if (!safeIntInput(&transactionType, "\nEnter your choice (1 or 2): "))
+        {
+            printf("✖ Invalid input! Please try again.\n");
+            sleep(2);
+            continue;
+        }
+
+        if (transactionType != 1 && transactionType != 2)
+        {
+            printf("✖ Invalid transaction type! Please choose 1 or 2.\n");
+            sleep(2);
+            continue;
+        }
+        break;
+    } while (1);
+
+    // Amount input with validation
+    printf("\n--- %s Transaction ---\n", (transactionType == 1) ? "Deposit" : "Withdrawal");
+
+    do
+    {
+        if (!safeStringInput(amountStr, sizeof(amountStr), "Enter amount: $"))
+        {
+            printf("✖ Input error! Please try again.\n");
+            sleep(2);
+            continue;
+        }
 
         if (!validateAmount(amountStr))
         {
@@ -677,33 +760,72 @@ void makeTransaction(struct User u)
         }
 
         amount = atof(amountStr);
+
+        // Additional validation for withdrawal
+        if (transactionType == 2 && amount > currentBalance)
+        {
+            printf("✖ Insufficient funds! Current balance: $%.2f\n", currentBalance);
+            printf("Maximum withdrawal amount: $%.2f\n", currentBalance);
+            sleep(2);
+            continue;
+        }
+
         break;
     } while (1);
 
+    // Calculate new balance
     double newBalance;
     if (transactionType == 1) // Deposit
     {
         newBalance = currentBalance + amount;
-        printf("Depositing $%.2f...\n", amount);
+        printf("\n→ Processing deposit of $%.2f...\n", amount);
     }
     else // Withdraw
     {
-        if (amount > currentBalance)
-        {
-            printf("✖ Insufficient funds! Current balance: $%.2f\n", currentBalance);
-            sleep(3);
-            makeTransaction(u);
-            return;
-        }
         newBalance = currentBalance - amount;
-        printf("Withdrawing $%.2f...\n", amount);
+        printf("\n→ Processing withdrawal of $%.2f...\n", amount);
     }
 
-    // Update balance
+    // Show transaction summary before confirmation
+    printf("\n═══════════════ Transaction Summary ═══════════════\n");
+    printf("Account ID      : %d\n", selectedAccountId);
+    printf("Transaction Type: %s\n", (transactionType == 1) ? "Deposit" : "Withdrawal");
+    printf("Amount          : $%.2f\n", amount);
+    printf("Current Balance : $%.2f\n", currentBalance);
+    printf("New Balance     : $%.2f\n", newBalance);
+    printf("═══════════════════════════════════════════════════\n");
+
+    int confirm;
+    do
+    {
+        if (!safeIntInput(&confirm, "\nConfirm transaction? [1] Yes [2] No: "))
+        {
+            printf("✖ Invalid input! Please try again.\n");
+            sleep(2);
+            continue;
+        }
+
+        if (confirm == 2)
+        {
+            printf("Transaction cancelled.\n");
+            sleep(2);
+            mainMenu(u);
+            return;
+        }
+        else if (confirm != 1)
+        {
+            printf("✖ Invalid choice! Please enter 1 for Yes or 2 for No.\n");
+            sleep(2);
+            continue;
+        }
+        break;
+    } while (1);
+
+    // Update balance in database
     char update_sql[] = "UPDATE records SET balance = ? WHERE account_id = ? AND user_id = ?";
     rc = sqlite3_prepare_v2(db, update_sql, -1, &stmt, NULL);
     sqlite3_bind_double(stmt, 1, newBalance);
-    sqlite3_bind_int(stmt, 2, accountId);
+    sqlite3_bind_int(stmt, 2, selectedAccountId);
     sqlite3_bind_int(stmt, 3, u.id);
 
     rc = sqlite3_step(stmt);
@@ -711,14 +833,16 @@ void makeTransaction(struct User u)
 
     if (rc == SQLITE_DONE)
     {
-        printf("✔ Transaction completed successfully!\n");
-        printf("New balance: $%.2f\n", newBalance);
+        printf("\n✔ Transaction completed successfully!\n");
+        printf("Account ID: %d\n", selectedAccountId);
+        printf("Transaction: %s $%.2f\n", (transactionType == 1) ? "Deposited" : "Withdrew", amount);
+        printf("New Balance: $%.2f\n", newBalance);
         success(u);
     }
     else
     {
         printf("✖ Transaction failed: %s\n", sqlite3_errmsg(db));
-        sleep(2);
+        sleep(3);
         mainMenu(u);
     }
 }
