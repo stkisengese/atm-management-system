@@ -41,11 +41,7 @@ void mainMenu(struct User u)
         makeTransaction(u);
         break;
     case 6:
-        // student TODO : add your **Remove existing account** function
-        // here
-        printf("Feature not implemented yet.\n");
-        sleep(2);
-        mainMenu(u);
+        removeAccount(u);
         break;
     case 7:
         // student TODO : add your **Transfer owner** function
