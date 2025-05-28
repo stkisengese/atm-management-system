@@ -132,13 +132,14 @@ void initMenu(struct User *u)
             registerMenu(temp_name, temp_pass);
             if (registerUser(temp_name, temp_pass))
             {
-                printf("\n\n✔ Registration successful! Please login.");
+                printf("\n\n✔ Registration successful! You're now signed-in.");
                 sleep(2);
             }
             else
             {
-                printf("\n\n✖ Registration failed! Username might already exist.");
+                printf("\n\n✖ Registration failed! Username already exist.");
                 sleep(2);
+                initMenu(u);
             }
             return;
         }
