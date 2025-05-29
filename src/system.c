@@ -293,26 +293,78 @@ void checkAllAccounts(struct User u)
     sqlite3_bind_int(stmt, 1, u.id);
 
     system("clear");
-    printf("\t\t====== All accounts from user, %s =====\n\n", u.name);
+    printf("\t\t\t===== Account Portfolio Overview =====\n");
+    printf("\n═══════════════════════════════════════════════════════════════\n");
+    printf("Account Owner: %s\n", u.name);
+    printf("═══════════════════════════════════════════════════════════════\n");
 
     int found = 0;
+    int accountNumber = 1;
+    double totalBalance = 0.0;
+
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
     {
         found = 1;
-        printf("_____________________\n");
-        printf("\nAccount number: %d\n", sqlite3_column_int(stmt, 0));
+        double balance = sqlite3_column_double(stmt, 4);
+        totalBalance += balance;
+
+        printf("\n[%d] ══════════════════════════════════════════════════════════\n", accountNumber);
+        printf("Account Number  : %d\n", sqlite3_column_int(stmt, 0));
+        printf("Account Type    : %s\n", sqlite3_column_text(stmt, 5));
         printf("Deposit Date    : %s\n", sqlite3_column_text(stmt, 1));
         printf("Country         : %s\n", sqlite3_column_text(stmt, 2));
-        printf("Phone number    : %s\n", sqlite3_column_text(stmt, 3));
-        printf("Amount deposited: $%.2f\n", sqlite3_column_double(stmt, 4));
-        printf("Type Of Account : %s\n", sqlite3_column_text(stmt, 5));
+        printf("Phone Number    : %s\n", sqlite3_column_text(stmt, 3));
+        printf("Current Balance : $%.2f\n", balance);
+
+        // Display account status based on type
+        const char *accountType = (const char *)sqlite3_column_text(stmt, 5);
+        if (strstr(accountType, "fixed") != NULL)
+        {
+            printf("Status          : Fixed Term (No transactions allowed)\n");
+        }
+        else if (strcmp(accountType, "saving") == 0)
+        {
+            printf("Status          : Active Savings Account\n");
+        }
+        else if (strcmp(accountType, "current") == 0)
+        {
+            printf("Status          : Active Current Account\n");
+        }
+        else
+        {
+            printf("Status          : Active\n");
+        }
+
+        printf("──────────────────────────────────────────────────────────────\n");
+        accountNumber++;
     }
 
     sqlite3_finalize(stmt);
 
     if (!found)
     {
-        printf("No accounts found for user %s\n", u.name);
+        printf("\n📋 No accounts found for user: %s\n", u.name);
+        printf("\n💡 TIP: Create your first account using option [1] from the main menu.\n");
+        printf("═══════════════════════════════════════════════════════════════\n");
+    }
+    else
+    {
+        printf("\n═══════════════════ Portfolio Summary ═══════════════════════\n");
+        printf("Total Accounts  : %d\n", accountNumber - 1);
+        printf("Combined Balance: $%.2f\n", totalBalance);
+        printf("═══════════════════════════════════════════════════════════════\n");
+
+        if (accountNumber > 2) // More than 1 account
+        {
+            printf("\n💼 Portfolio Diversification:\n");
+            printf("   • You have multiple accounts for better financial management\n");
+            printf("   • Consider different account types for various savings goals\n");
+        }
+
+        printf("\n📊 Quick Actions Available:\n");
+        printf("   • View detailed account info: Use option [3]\n");
+        printf("   • Make transactions: Use option [5]\n");
+        printf("   • Update account details: Use option [2]\n");
     }
 
     success(u);
