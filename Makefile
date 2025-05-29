@@ -38,7 +38,7 @@ $(OBJDIR)/sqlite3.o: $(SQLITEDIR)/sqlite3.c
 	$(CC) -c $(SQLITEDIR)/sqlite3.c -o $@ -DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION
 
 clean:
-	rm -rf $(OBJDIR) $(TARGET) atm.db
+	rm -rf $(OBJDIR) $(TARGET) #atm.db
 
 # Download and setup SQLite amalgamation
 download-sqlite:
