@@ -1067,94 +1067,264 @@ void transferOwnership(struct User u)
 {
     sqlite3 *db = getDatabase();
     sqlite3_stmt *stmt;
-    int accountId;
+    int accountChoice;
     char targetUsername[50];
     int targetUserId;
+    int accountIds[100]; // Array to store account IDs
+    int accountCount = 0;
 
     system("clear");
     printf("\t\t\t===== Transfer Account Ownership =====\n");
 
-    // Show user's accounts
-    char list_sql[] = "SELECT account_id, balance, account_type FROM records WHERE user_id = ?";
+    // First, show user's accounts with selection numbers
+    char list_sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE user_id = ?";
     int rc = sqlite3_prepare_v2(db, list_sql, -1, &stmt, NULL);
-    sqlite3_bind_int(stmt, 1, u.id);
 
-    printf("Your accounts:\n");
-    int found = 0;
-    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
+    if (rc != SQLITE_OK)
     {
-        found = 1;
-        printf("Account ID: %d, Balance: $%.2f, Type: %s\n",
-               sqlite3_column_int(stmt, 0),
-               sqlite3_column_double(stmt, 1),
-               sqlite3_column_text(stmt, 2));
-    }
-    sqlite3_finalize(stmt);
-
-    if (!found)
-    {
-        printf("No accounts found!\n");
+        printf("Database error: %s\n", sqlite3_errmsg(db));
         sleep(2);
         mainMenu(u);
         return;
     }
 
-    printf("\nEnter account ID to transfer: ");
-    scanf("%d", &accountId);
+    sqlite3_bind_int(stmt, 1, u.id);
 
-    // Verify account belongs to user
-    char verify_sql[] = "SELECT COUNT(*) FROM records WHERE account_id = ? AND user_id = ?";
-    rc = sqlite3_prepare_v2(db, verify_sql, -1, &stmt, NULL);
-    sqlite3_bind_int(stmt, 1, accountId);
+    printf("\nYour accounts available for transfer:\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+
+    int found = 0;
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && accountCount < 100)
+    {
+        found = 1;
+        accountCount++;
+        accountIds[accountCount - 1] = sqlite3_column_int(stmt, 0); // Store account ID
+
+        printf("[%d] Account ID: %d (%s)\n", accountCount, accountIds[accountCount - 1],
+               sqlite3_column_text(stmt, 5)); // Show account type
+        printf("    Balance: $%.2f\n", sqlite3_column_double(stmt, 4));
+        printf("    Country: %s | Phone: %s\n",
+               sqlite3_column_text(stmt, 2), sqlite3_column_text(stmt, 3));
+        printf("    Deposit Date: %s\n", sqlite3_column_text(stmt, 1));
+        printf("───────────────────────────────────────────────────────────────\n");
+    }
+    sqlite3_finalize(stmt);
+
+    if (!found)
+    {
+        printf("No accounts found for transfer!\n");
+        sleep(2);
+        mainMenu(u);
+        return;
+    }
+
+    // Get user's account selection
+    do
+    {
+        if (!safeIntInput(&accountChoice, "\nSelect account to transfer (enter the number): "))
+        {
+            printf("✖ Invalid input! Please try again.\n");
+            sleep(2);
+            continue;
+        }
+
+        if (accountChoice < 1 || accountChoice > accountCount)
+        {
+            printf("✖ Invalid selection! Please choose a number between 1 and %d.\n", accountCount);
+            sleep(2);
+            continue;
+        }
+        break;
+    } while (1);
+
+    int selectedAccountId = accountIds[accountChoice - 1];
+
+    // Get detailed account information for confirmation
+    char detail_sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE account_id = ? AND user_id = ?";
+    rc = sqlite3_prepare_v2(db, detail_sql, -1, &stmt, NULL);
+
+    if (rc != SQLITE_OK)
+    {
+        printf("Database error: %s\n", sqlite3_errmsg(db));
+        sleep(2);
+        mainMenu(u);
+        return;
+    }
+
+    sqlite3_bind_int(stmt, 1, selectedAccountId);
     sqlite3_bind_int(stmt, 2, u.id);
 
     rc = sqlite3_step(stmt);
-    int accountExists = sqlite3_column_int(stmt, 0);
-    sqlite3_finalize(stmt);
-
-    if (accountExists == 0)
+    if (rc != SQLITE_ROW)
     {
+        sqlite3_finalize(stmt);
         printf("✖ Account not found!\n");
         sleep(2);
         stayOrReturn(0, transferOwnership, u);
         return;
     }
 
-    printf("Enter username to transfer to: ");
-    scanf("%s", targetUsername);
-
-    // Find target user ID
-    char user_sql[] = "SELECT id FROM users WHERE name = ?";
-    rc = sqlite3_prepare_v2(db, user_sql, -1, &stmt, NULL);
-    sqlite3_bind_text(stmt, 1, targetUsername, -1, SQLITE_STATIC);
-
-    rc = sqlite3_step(stmt);
-    if (rc != SQLITE_ROW)
-    {
-        sqlite3_finalize(stmt);
-        printf("✖ Target user '%s' not found!\n", targetUsername);
-        sleep(2);
-        transferOwnership(u);
-        return;
-    }
-
-    targetUserId = sqlite3_column_int(stmt, 0);
+    // Store account details for later display
+    int accountId = sqlite3_column_int(stmt, 0);
+    char depositDate[20], country[50], phone[20], accountType[20];
+    strcpy(depositDate, (char *)sqlite3_column_text(stmt, 1));
+    strcpy(country, (char *)sqlite3_column_text(stmt, 2));
+    strcpy(phone, (char *)sqlite3_column_text(stmt, 3));
+    strcpy(accountType, (char *)sqlite3_column_text(stmt, 5));
+    double balance = sqlite3_column_double(stmt, 4);
     sqlite3_finalize(stmt);
 
-    if (targetUserId == u.id)
+    system("clear");
+    printf("\t\t\t===== Transfer Account Ownership =====\n");
+    printf("\n✔ Selected Account ID: %d (%s)\n", selectedAccountId, accountType);
+    printf("Current Balance: $%.2f\n", balance);
+
+    // Get target username with validation
+    printf("\n═══════════════════════════════════════════════════════════════\n");
+    printf("Transfer Recipient Information:\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+
+    do
     {
-        printf("✖ Cannot transfer account to yourself!\n");
+        if (!safeStringInput(targetUsername, sizeof(targetUsername), "\nEnter recipient's username: "))
+        {
+            printf("✖ Input error! Please try again.\n");
+            sleep(2);
+            continue;
+        }
+
+        // Validate username format (basic validation)
+        if (strlen(targetUsername) < 3)
+        {
+            printf("✖ Username must be at least 3 characters long!\n");
+            sleep(2);
+            continue;
+        }
+
+        // Check if user is trying to transfer to themselves
+        if (strcmp(targetUsername, u.name) == 0)
+        {
+            printf("✖ Cannot transfer account to yourself!\n");
+            sleep(2);
+            continue;
+        }
+
+        // Find target user ID
+        char user_sql[] = "SELECT id FROM users WHERE name = ?";
+        rc = sqlite3_prepare_v2(db, user_sql, -1, &stmt, NULL);
+        sqlite3_bind_text(stmt, 1, targetUsername, -1, SQLITE_STATIC);
+        rc = sqlite3_step(stmt);
+
+        if (rc != SQLITE_ROW)
+        {
+            sqlite3_finalize(stmt);
+            printf("✖ User '%s' not found in the system!\n", targetUsername);
+            printf("Please verify the username and try again.\n");
+            sleep(2);
+            continue;
+        }
+
+        targetUserId = sqlite3_column_int(stmt, 0);
+        sqlite3_finalize(stmt);
+        break;
+    } while (1);
+
+    // Show transfer confirmation
+    system("clear");
+    printf("\t\t\t===== Transfer Account Ownership =====\n");
+    printf("\n⚠️  OWNERSHIP TRANSFER CONFIRMATION\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+    printf("ACCOUNT TO TRANSFER:\n");
+    printf("Account Number : %d\n", accountId);
+    printf("Account Type   : %s\n", accountType);
+    printf("Balance        : $%.2f\n", balance);
+    printf("Country        : %s\n", country);
+    printf("Phone Number   : %s\n", phone);
+    printf("Deposit Date   : %s\n", depositDate);
+    printf("───────────────────────────────────────────────────────────────\n");
+    printf("TRANSFER DETAILS:\n");
+    printf("From           : %s (You)\n", u.name);
+    printf("To             : %s\n", targetUsername);
+    printf("═══════════════════════════════════════════════════════════════\n");
+
+    printf("\n🚨 IMPORTANT WARNINGS:\n");
+    printf("• You will LOSE complete access to this account\n");
+    printf("• %s will become the new owner\n", targetUsername);
+    printf("• This transfer is PERMANENT and cannot be undone\n");
+    printf("• All future transactions will require the new owner's authorization\n");
+
+    printf("\n═══════════════════════════════════════════════════════════════\n");
+    printf("Transfer Confirmation:\n");
+    printf("[1] Proceed with ownership transfer\n");
+    printf("[2] Cancel and return to main menu\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+
+    int transferChoice;
+    do
+    {
+        if (!safeIntInput(&transferChoice, "\nEnter your choice (1 or 2): "))
+        {
+            printf("✖ Invalid input! Please try again.\n");
+            sleep(2);
+            continue;
+        }
+
+        if (transferChoice == 2)
+        {
+            printf("\n✔ Transfer cancelled. Returning to main menu...\n");
+            sleep(2);
+            mainMenu(u);
+            return;
+        }
+        else if (transferChoice != 1)
+        {
+            printf("✖ Invalid choice! Please enter 1 to proceed or 2 to cancel.\n");
+            sleep(2);
+            continue;
+        }
+        break;
+    } while (1);
+
+    // Final confirmation with text input
+    printf("\n--- Final Security Confirmation ---\n");
+    char confirmation[20];
+    do
+    {
+        if (!safeStringInput(confirmation, sizeof(confirmation), "Type 'TRANSFER' to confirm ownership transfer: "))
+        {
+            printf("✖ Input error! Please try again.\n");
+            sleep(2);
+            continue;
+        }
+
+        if (strcmp(confirmation, "TRANSFER") != 0)
+        {
+            printf("✖ Confirmation failed! You must type 'TRANSFER' exactly.\n");
+            printf("Transfer cancelled. Returning to main menu...\n");
+            sleep(3);
+            mainMenu(u);
+            return;
+        }
+        break;
+    } while (1);
+
+    // Proceed with transfer
+    printf("\n→ Processing ownership transfer...\n");
+
+    char transfer_sql[] = "UPDATE records SET user_id = ?, user_name = ? WHERE account_id = ? AND user_id = ?";
+    rc = sqlite3_prepare_v2(db, transfer_sql, -1, &stmt, NULL);
+
+    if (rc != SQLITE_OK)
+    {
+        printf("✖ Database error: %s\n", sqlite3_errmsg(db));
         sleep(2);
-        transferOwnership(u);
+        mainMenu(u);
         return;
     }
 
-    // Transfer ownership
-    char transfer_sql[] = "UPDATE records SET user_id = ?, user_name = ? WHERE account_id = ? AND user_id = ?";
-    rc = sqlite3_prepare_v2(db, transfer_sql, -1, &stmt, NULL);
     sqlite3_bind_int(stmt, 1, targetUserId);
     sqlite3_bind_text(stmt, 2, targetUsername, -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 3, accountId);
+    sqlite3_bind_int(stmt, 3, selectedAccountId);
     sqlite3_bind_int(stmt, 4, u.id);
 
     rc = sqlite3_step(stmt);
@@ -1162,13 +1332,25 @@ void transferOwnership(struct User u)
 
     if (rc == SQLITE_DONE)
     {
-        printf("✔ Account %d has been successfully transferred to %s!\n", accountId, targetUsername);
+        system("clear");
+        printf("\t\t\t===== Transfer Complete =====\n");
+        printf("\n✔ SUCCESS: Ownership transfer completed!\n");
+        printf("\n═══════════════ Transfer Summary ═══════════════\n");
+        printf("Transferred Account: %d (%s)\n", selectedAccountId, accountType);
+        printf("Account Balance    : $%.2f\n", balance);
+        printf("Previous Owner     : %s\n", u.name);
+        printf("New Owner          : %s\n", targetUsername);
+        printf("Transfer Status    : Completed Successfully\n");
+        printf("═══════════════════════════════════════════════\n");
+        printf("\nNOTE: You no longer have access to this account.\n");
+        printf("%s is now the sole owner and can manage all account activities.\n", targetUsername);
+
         success(u);
     }
     else
     {
-        printf("✖ Error transferring account: %s\n", sqlite3_errmsg(db));
-        sleep(2);
-        mainMenu(u);
+        printf("✖ Error transferring account ownership: %s\n", sqlite3_errmsg(db));
+        sleep(3);
+        stayOrReturn(0, transferOwnership, u);
     }
 }
