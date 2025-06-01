@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #ifndef HEADER_H
 #define HEADER_H
 
