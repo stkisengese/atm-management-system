@@ -9,6 +9,7 @@ void mainMenu(struct User u)
     printf("\t\t\t║         ATM SYSTEM        ║\n");
     printf("\t\t\t╚═══════════════════════════╝\n");
     
+    printf("\n\t\t Welcome back, %s!\n", u.name);
     printf("\n\t\t-->> Feel free to choose one of the options below <<--\n");
     
     printf("\n\t\t╔═══════════════════════════════════════════╗\n");
@@ -19,7 +20,8 @@ void mainMenu(struct User u)
     printf("\t\t║  [5] - Make Transaction                   ║\n");
     printf("\t\t║  [6] - Remove existing account            ║\n");
     printf("\t\t║  [7] - Transfer ownership                 ║\n");
-    printf("\t\t║  [8] - Exit                               ║\n");
+    printf("\t\t║  [8] - Logout (Switch User)               ║\n");
+    printf("\t\t║  [9] - Exit System                        ║\n");
     printf("\t\t╚═══════════════════════════════════════════╝\n");
     
     if (!safeIntInput(&option, "\n\t\t Enter your choice: "))
@@ -54,13 +56,24 @@ void mainMenu(struct User u)
         transferOwnership(u);
         break;
     case 8:
-        printf("\n\t\t Thank you for using our ATM system!\n");
+        // Logout - clear user data and return to login menu
+        printf("\n\t\t ✔ Logging out %s...\n", u.name);
+        printf("\t\t Returning to login screen.\n");
+        sleep(1);
+        
+        // Clear the user struct
+        struct User newUser = {0};
+        initMenu(&newUser);
+        mainMenu(newUser);
+        return;
+    case 9:
+        printf("\n\t\t Thank you for using our ATM system, %s!\n", u.name);
         printf("\t\t Exiting...\n\n");
         closeDatabase();
         exit(0);
         break;
     default:
-        printf("\t\t ✖ Invalid operation! Please choose a number between 1-8.\n");
+        printf("\t\t ✖ Invalid operation! Please choose a number between 1-9.\n");
         sleep(2);
         mainMenu(u);
     }
