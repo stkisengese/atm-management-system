@@ -33,7 +33,7 @@ int initDatabase()
                         "account_id INTEGER NOT NULL,"
                         "deposit_date TEXT NOT NULL CHECK(deposit_date GLOB '[0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9]'),"
                         "country TEXT NOT NULL CHECK(LENGTH(country) > 0 AND country NOT GLOB '*[0-9]*'),"
-                        "phone TEXT NOT NULL CHECK(phone GLOB '+[0-9]*' OR phone GLOB '0[0-9]*'),"
+                        "phone TEXT NOT NULL,"
                         "balance REAL NOT NULL CHECK(balance >= 0),"
                         "account_type TEXT NOT NULL CHECK(account_type IN ('saving', 'current', 'fixed01', 'fixed02', 'fixed03')),"
                         "UNIQUE(user_id, account_id),"
