@@ -121,7 +121,6 @@ void initMenu(struct User *u)
                 sleep(2);
                 continue;
             }
-            r = 1;
             break;
             
         case 2:
@@ -130,18 +129,30 @@ void initMenu(struct User *u)
             registerMenu(temp_name, temp_pass);
             if (registerUser(temp_name, temp_pass))
             {
-                printf("\n\t\t ✔ Registration successful!\n");
-                printf("\t\t Welcome to the ATM system, %s!\n", temp_name);
-                printf("\t\t You're now signed in.\n");
-                sleep(2);
+                // Populate the user struct with the new user's details
+                strcpy(u->name, temp_name);
+                strcpy(u->password, temp_pass);
+                
+                // Get the user ID from database
+                if (getPassword(u)) {
+                    printf("\n\t\t ✔ Registration successful!\n");
+                    printf("\t\t Welcome to the ATM system, %s!\n", u->name);
+                    printf("\t\t You're now signed in.\n");
+                    sleep(2);
+                    r = 1; // Exit the loop to go to main menu
+                } else {
+                    printf("\n\t\t ✖ Error retrieving user details after registration.\n");
+                    sleep(2);
+                    continue;
+                }
             }
             else
             {
                 printf("\n\t\t ✖ Registration failed! Username already exists.\n");
                 sleep(2);
-                initMenu(u);
+                continue;
             }
-            return;
+            break;
         }
         
         case 3:
