@@ -56,6 +56,8 @@ int validateAmount(const char *amountStr);
 int validateAccountNumber(const char *acctNum);
 
 // authentication functions
+void initMenu(struct User *u);
+void mainMenu(struct User u);
 void loginMenu(char a[50], char pass[50]);
 void registerMenu(char a[50], char pass[50]);
 int getPassword(struct User *u);
