@@ -1,22 +1,30 @@
 #include "header.h"
+
 void loginMenu(char a[50], char pass[50])
 {
     struct termios oflags, nflags;
 
     system("clear");
-    // Single coordinated output for the header and username prompt
-    printf("\n\n\n\t\t\t\t   Bank Management System\n"
-           "\t\t\t\t\t User Login\n\n"
-           "\t\t\t\tEnter username: ");
+    
+    printf("\n\t\t\t╔══════════════════════════╗\n");
+    printf("\t\t\t║         ATM SYSTEM       ║\n");
+    printf("\t\t\t╠══════════════════════════╣\n");
+    printf("\t\t\t║        USER LOGIN        ║\n");
+    printf("\t\t\t╚══════════════════════════╝\n");
+    
+    printf("\n\t\t Please enter your login credentials:\n");
+    
+
+    printf("\t\t  Username: ");
     fflush(stdout);
     //  Get username
     if (fgets(a, 50, stdin) == NULL)
     {
-        printf("✖ Input error\n");
+        printf("\n\t\t ✖ Input error\n");
         return;
     }
     a[strcspn(a, "\n")] = '\0'; // remove newline
-
+    
     // disabling echo for password input
     tcgetattr(fileno(stdin), &oflags);
     nflags = oflags;
@@ -29,24 +37,27 @@ void loginMenu(char a[50], char pass[50])
         exit(1);
     }
 
-    printf("\n\t\t\t\tEnter password: ");
+    printf("\t\t  Password: ");
     fflush(stdout);
     if (fgets(pass, 50, stdin) == NULL)
     {
         // Restore terminal settings on error
         tcsetattr(fileno(stdin), TCSANOW, &oflags);
-        printf("✖ Input error\n");
+        printf("\n\t\t ✖ Input error\n");
         return;
     }
     pass[strcspn(pass, "\n")] = '\0';
-
+    
     // restore terminal
     if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
     {
         perror("tcsetattr");
         exit(1);
     }
+    
+    printf("\n\t\t Processing login...\n");
 }
+
 void registerMenu(char a[50], char pass[50])
 {
     struct termios oflags, nflags;
@@ -56,11 +67,18 @@ void registerMenu(char a[50], char pass[50])
     while (1)
     {
         system("clear");
-        printf("\n\n\n\t\t\t\t   Bank Management System\n\t\t\t\t\t User Registration:");
+        
+        printf("\n\t\t\t╔══════════════════════════╗\n");
+        printf("\t\t\t║         ATM SYSTEM       ║\n");
+        printf("\t\t\t╠══════════════════════════╣\n");
+        printf("\t\t\t║     USER REGISTRATION    ║\n");
+        printf("\t\t\t╚══════════════════════════╝\n");
+        
+        printf("\n\t\t Create your new account:\n");
 
-        if (!safeStringInput(a, 50, "\n\t\t\t\tEnter username: "))
+        if (!safeStringInput(a, 50, "\t\t  Enter username: "))
         {
-            printf("✖ Input error. Please try again.\n");
+            printf("\t\t  ✖ Input error. Please try again.\n");
             sleep(2);
             continue;
         }
@@ -70,13 +88,24 @@ void registerMenu(char a[50], char pass[50])
             sleep(2);
             continue;
         }
-
+        
         break; // username is valid
     }
 
     // ---------- Loop for Valid Password ----------
     while (1)
     {
+        system("clear");
+        
+        printf("\n\t\t\t╔══════════════════════════╗\n");
+        printf("\t\t\t║         ATM SYSTEM       ║\n");
+        printf("\t\t\t╠══════════════════════════╣\n");
+        printf("\t\t\t║     USER REGISTRATION    ║\n");
+        printf("\t\t\t╚══════════════════════════╝\n");
+        
+        printf("\n\t\t Username: %s\n", a);
+        printf("\n\t\t Set your password:\n");
+        
         // Disable echo for secure password input
         tcgetattr(fileno(stdin), &oflags);
         nflags = oflags;
@@ -89,7 +118,7 @@ void registerMenu(char a[50], char pass[50])
             exit(1);
         }
 
-        printf("\n\t\t\t\tEnter password: ");
+        printf("\t\t  Enter password: ");
         fflush(stdout);
 
         if (fgets(pass, 50, stdin) != NULL)
@@ -112,7 +141,7 @@ void registerMenu(char a[50], char pass[50])
         // ---------- Confirm Password ----------
         // Disable echo again
         tcsetattr(fileno(stdin), TCSANOW, &nflags);
-        printf("\n\t\t\t\tRe-enter password: ");
+        printf("\t\t  Confirm password: ");
         fflush(stdout);
 
         if (fgets(confirmPass, 50, stdin) != NULL)
@@ -123,11 +152,13 @@ void registerMenu(char a[50], char pass[50])
 
         if (strcmp(pass, confirmPass) != 0)
         {
-            printf("\n\t\t\t\t✖ Passwords do not match. Try again.\n");
+            printf("\n\t\t ✖ Passwords do not match. Try again.\n");
             sleep(2);
             continue;
         }
 
+        printf("\n\t\t ✔ Password set successfully!\n");
+        sleep(2);
         break; // password is valid and confirmed
     }
 }
@@ -207,7 +238,7 @@ int validatePassword(const char *pass)
 {
     if (!pass)
     {
-        printf("\t\t\t\t✖ Password cannot be empty.\n");
+        printf("\t\t  ✖ Password cannot be empty.\n");
         return 0;
     }
 
@@ -215,7 +246,7 @@ int validatePassword(const char *pass)
 
     if (len < 4 || len > 12)
     {
-        printf("\t\t\t\t✖ Password must be between 4 and 12 characters long.\n");
+        printf("\t\t  ✖ Password must be 4-12 chars.\n");
         return 0;
     }
 
@@ -224,7 +255,7 @@ int validatePassword(const char *pass)
         char c = pass[i];
         if (!(isalnum((unsigned char)c) || c == '-' || c == '_'))
         {
-            printf("\t\t\t\t✖ Password can only contain letters, numbers, '-' and '_'.\n");
+            printf("\t\t  ✖ Only letters, numbers, -, _    \n");
             return 0;
         }
     }
