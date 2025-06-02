@@ -50,7 +50,7 @@ sqlite3 *getDatabase();
 void closeDatabase();
 int accountExists(int accountId);
 int validateDate(int month, int day, int year);
-int validateAccountType(char *accountType);
+// int validateAccountType(char *accountType);
 int validateName(char *name);
 int validatePhone(const char *phoneStr);
 int validateAmount(const char *amountStr);
