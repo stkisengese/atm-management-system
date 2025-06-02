@@ -218,21 +218,78 @@ void createNewAcc(struct User u)
     } while (1);
 
     // Validate account type input
+    int accountTypeChoice;
     do
     {
-        printf("\nChoose the type of account:\n");
-        printf("\t-> saving\n\t-> current\n\t-> fixed01\t(for 1 year)\n\t-> fixed02\t(for 2 years)\n\t-> fixed03 \t(for 3 years)\n");
+        printf("\n═══════════════════════════════════════════════════════════════\n");
+        printf("Choose the type of account:\n");
+        printf("[1] Saving Account\n");
+        printf("[2] Current Account\n");
+        printf("[3] Fixed Deposit - 1 Year (fixed01)\n");
+        printf("[4] Fixed Deposit - 2 Years (fixed02)\n");
+        printf("[5] Fixed Deposit - 3 Years (fixed03)\n");
+        printf("═══════════════════════════════════════════════════════════════\n");
 
-        if (!safeStringInput(r.accountType, sizeof(r.accountType), "\nEnter your choice: "))
+        if (!safeIntInput(&accountTypeChoice, "\nEnter your choice (1-5): "))
         {
-            printf("✖ Input error! Please try again.\n");
+            printf("✖ Invalid input! Please try again.\n");
             sleep(2);
             continue;
         }
 
-        if (!validateAccountType(r.accountType))
-            sleep(2);
-    } while (!validateAccountType(r.accountType));
+        // Map the choice to account type string
+        switch (accountTypeChoice)
+        {
+            case 1:
+                strcpy(r.accountType, "saving");
+                break;
+            case 2:
+                strcpy(r.accountType, "current");
+                break;
+            case 3:
+                strcpy(r.accountType, "fixed01");
+                break;
+            case 4:
+                strcpy(r.accountType, "fixed02");
+                break;
+            case 5:
+                strcpy(r.accountType, "fixed03");
+                break;
+            default:
+                printf("✖ Invalid choice! Please select a number between 1 and 5.\n");
+                sleep(2);
+                continue;
+        }
+
+        // Show confirmation of selected account type
+        printf("\n✔ Selected Account Type: %s\n", r.accountType);
+        
+        // Show additional info for fixed accounts
+        if (accountTypeChoice >= 3 && accountTypeChoice <= 5)
+        {
+            int years = accountTypeChoice - 2; // Convert choice to years (3->1, 4->2, 5->3)
+            printf("📌 Note: Fixed deposit account for %d year(s)\n", years);
+            printf("   • Higher interest rate\n");
+            printf("   • No withdrawals/deposits allowed during term\n");
+            printf("   • Funds locked until maturity\n");
+        }
+        else if (accountTypeChoice == 1)
+        {
+            printf("📌 Note: Savings account features:\n");
+            printf("   • Earn interest on deposits\n");
+            printf("   • Suitable for long-term savings\n");
+            printf("   • Flexible deposits and withdrawals\n");
+        }
+        else if (accountTypeChoice == 2)
+        {
+            printf("📌 Note: Current account features:\n");
+            printf("   • Designed for frequent transactions\n");
+            printf("   • No interest earned\n");
+            printf("   • Unlimited deposits and withdrawals\n");
+        }
+        
+        break;
+    } while (1);
 
     // Insert new account record
     char insert_sql[] = "INSERT INTO records (user_id, user_name, account_id, deposit_date, country, phone, balance, account_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
