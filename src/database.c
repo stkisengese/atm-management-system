@@ -165,9 +165,9 @@ int validatePhone(const char *phoneStr)
 {
     size_t len = strlen(phoneStr);
 
-    if (len < 10 || len > 15)
+    if (len < 8 || len > 15)
     {
-        printf("✖ Phone number must be between 10 and 15 digits long.\n");
+        printf("✖ Phone number must be between 8 and 15 digits long.\n");
         return 0;
     }
 
