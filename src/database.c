@@ -242,9 +242,9 @@ int validateAccountNumber(const char *acctNum)
 {
     size_t len = strlen(acctNum);
 
-    if (len < 6 || len > 12)
+    if (len < 1 || len > 12)
     {
-        printf("✖ Account number must be between 6 and 12 digits long.\n");
+        printf("✖ Account number must be less than 12 digits long.\n");
         return 0;
     }
 
