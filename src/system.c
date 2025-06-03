@@ -1409,10 +1409,8 @@ void transferOwnership(struct User u)
         if (strcmp(confirmation, "TRANSFER") != 0)
         {
             printf("✖ Confirmation failed! You must type 'TRANSFER' exactly.\n");
-            printf("Transfer cancelled. Returning to main menu...\n");
             sleep(3);
-            mainMenu(u);
-            return;
+            continue;
         }
         break;
     } while (1);
