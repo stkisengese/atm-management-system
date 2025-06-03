@@ -47,6 +47,10 @@ The ATM Banking System is a secure, feature-rich command-line banking applicatio
    ```bash
    ./atm
    ```
+5. To debug - setup info:
+   ```bash
+   make setup
+   ```
 
 ## Complete Feature Set
 
