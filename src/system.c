@@ -1123,10 +1123,8 @@ void removeAccount(struct User u)
         if (strcmp(confirmation, "DELETE") != 0)
         {
             printf("✖ Confirmation failed! You must type 'DELETE' exactly.\n");
-            printf("Account deletion cancelled. Returning to main menu...\n");
             sleep(3);
-            mainMenu(u);
-            return;
+            continue;
         }
         break;
     } while (1);
