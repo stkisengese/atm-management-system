@@ -74,10 +74,10 @@ void displayInterestInfo(const char *accountType, double balance, const char *de
         printf("You will not get interests because the account is of type current\n");
         return;
     }
-
+    
     double interestRate = 0.0;
     int maturityYears = 0;
-
+    
     // Set interest rates and maturity periods
     if (strcmp(accountType, "saving") == 0)
     {
@@ -98,7 +98,7 @@ void displayInterestInfo(const char *accountType, double balance, const char *de
         interestRate = 0.08; // 8% annual
         maturityYears = 3;
     }
-
+    
     // Extract date components from deposit date (format: mm/dd/yyyy)
     int month, day, year;
     sscanf(depositDate, "%d/%d/%d", &month, &day, &year);
@@ -112,15 +112,11 @@ void displayInterestInfo(const char *accountType, double balance, const char *de
     }
     else
     {
-        // For fixed accounts: compound interest at maturity
-        double maturityAmount = balance;
-        for (int i = 0; i < maturityYears; i++)
-        {
-            maturityAmount += maturityAmount * interestRate;
-        }
-        double totalInterest = maturityAmount - balance;
+        // For fixed accounts: SIMPLE INTEREST (Simple Interest = Principal × Rate × Time)
+        double totalInterest = balance * interestRate * maturityYears;
+        double maturityAmount = balance + totalInterest;
         int maturityYear = year + maturityYears;
-
+        
         printf("Maturity Period: %d year(s)\n", maturityYears);
         printf("Maturity Date: %02d/%02d/%04d\n", month, day, maturityYear);
         printf("You will get $%.2f as interest on %02d/%02d/%04d\n",
