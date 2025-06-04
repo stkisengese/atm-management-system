@@ -3,31 +3,13 @@
 void mainMenu(struct User u)
 {
     int option;
-    system("clear");
-    
-    printf("\n\t\t\t╔═══════════════════════════╗\n");
-    printf("\t\t\t║         ATM SYSTEM        ║\n");
-    printf("\t\t\t╚═══════════════════════════╝\n");
-    
-    printf("\n\t\t Welcome back, %s!\n", u.name);
-    printf("\n\t\t-->> Feel free to choose one of the options below <<--\n");
-    
-    printf("\n\t\t╔═══════════════════════════════════════════╗\n");
-    printf("\t\t║  [1] - Create a new account               ║\n");
-    printf("\t\t║  [2] - Update account information         ║\n");
-    printf("\t\t║  [3] - Check accounts                     ║\n");
-    printf("\t\t║  [4] - Check list of owned account        ║\n");
-    printf("\t\t║  [5] - Make Transaction                   ║\n");
-    printf("\t\t║  [6] - Remove existing account            ║\n");
-    printf("\t\t║  [7] - Transfer ownership                 ║\n");
-    printf("\t\t║  [8] - Logout (Switch User)               ║\n");
-    printf("\t\t║  [9] - Exit System                        ║\n");
-    printf("\t\t╚═══════════════════════════════════════════╝\n");
+    clearScreen();
+    showATMHeader();
+    showMainMenu(u);
     
     if (!safeIntInput(&option, "\n\t\t Enter your choice: "))
     {
-        printf("\t\t ✖ Input error. Please try again!\n");
-        sleep(2);
+        showInputErrorMessage();
         mainMenu(u);
         return;
     }
@@ -67,14 +49,10 @@ void mainMenu(struct User u)
         mainMenu(newUser);
         return;
     case 9:
-        printf("\n\t\t Thank you for using our ATM system, %s!\n", u.name);
-        printf("\t\t Exiting...\n\n");
-        closeDatabase();
-        exit(0);
+        showThankYouMessage();
         break;
     default:
-        printf("\t\t ✖ Invalid operation! Please choose a number between 1-9.\n");
-        sleep(2);
+        showValidationError("operation", "Please choose a number between 1-9.");
         mainMenu(u);
     }
 }
@@ -88,23 +66,12 @@ void initMenu(struct User *u)
     while (!r)
     {
         system("clear");
-        printf("\n\t\t\t╔══════════════════════════╗\n");
-        printf("\t\t\t║         ATM SYSTEM       ║\n");
-        printf("\t\t\t╚══════════════════════════╝\n");
-        
-        printf("\n\t\t Welcome to the ATM System\n");
-        printf("\t\t Please select an option:\n");
-        
-        printf("\n\t\t╔══════════════════════════════════╗\n");
-        printf("\t\t║  [1] - Login to existing account ║\n");
-        printf("\t\t║  [2] - Register new user         ║\n");
-        printf("\t\t║  [3] - Exit system               ║\n");
-        printf("\t\t╚══════════════════════════════════╝\n");
+        showATMHeader();
+        showLoginMenu(u->name, inputPass);
         
         if (!safeIntInput(&option, "\n\t\t Enter your choice: "))
         {
-            printf("\t\t ✖ Input error! Please try again.\n");
-            sleep(2);
+            showInputErrorMessage();
             continue;
         }
         
@@ -123,15 +90,13 @@ void initMenu(struct User *u)
                 }
                 else
                 {
-                    printf("\n\t\t ✖ Wrong password!\n");
-                    sleep(2);
+                    showErrorMessage("Wrong password! Please try again.");
                     continue;
                 }
             }
             else
             {
-                printf("\n\t\t ✖ Username not found!\n");
-                sleep(2);
+                showErrorMessage("Username not found!");
                 continue;
             }
             break;
@@ -154,30 +119,24 @@ void initMenu(struct User *u)
                     sleep(2);
                     r = 1; // Exit the loop to go to main menu
                 } else {
-                    printf("\n\t\t ✖ Error retrieving user details after registration.\n");
-                    sleep(2);
+                    showErrorMessage("Failed to retrieve user details after registration.");
                     continue;
                 }
             }
             else
-            {
-                printf("\n\t\t ✖ Registration failed! Username already exists.\n");
-                sleep(2);
+            {   
+                showErrorMessage("Registration failed! Username already exists.");
                 continue;
             }
             break;
         }
         
         case 3:
-            printf("\n\t\t Thank you for using our ATM system!\n");
-            printf("\t\t Exiting...\n\n");
-            closeDatabase();
-            exit(0);
+            showThankYouMessage();
             break;
             
         default:
-            printf("\t\t ✖ Invalid operation! Please choose 1, 2, or 3.\n");
-            sleep(2);
+            showValidationError("operation", "Please choose 1, 2, or 3.");
             continue;
         }
     }
