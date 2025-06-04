@@ -87,9 +87,9 @@ void clearScreen();
 void showATMHeader();
 // void showWelcomeMessage();
 void showSuccessMessage();
-void showErrorMessage(const char* message);
-void showWarningMessage(const char* message);
-void showInfoMessage(const char* message);
+void showErrorMessage(const char *message);
+void showWarningMessage(const char *message);
+void showInfoMessage(const char *message);
 void showThankYouMessage();
 
 // =====================================================
@@ -98,8 +98,9 @@ void showThankYouMessage();
 void showMainMenu(struct User u);
 void showLoginMenu();
 void showAccountTypeMenu();
-// void showTransactionMenu();
-// void showUpdateMenu();
+void showTransactionMenu(int selectedAccountId, const char *accountType, double currentBalance);
+void showUpdateMenu(int selectedAccountId, const char *country, const char *phoneNumber);
+void showUpdateDetails(const char *country, const char *phone);
 
 // =====================================================
 // ACCOUNT DISPLAY FUNCTIONS
@@ -115,13 +116,13 @@ void showAccountTypeInfo(int accountTypeChoice);
 void showAccountDetails(int accountId, const char *depositDate, const char *country,
                        const char *phone, double balance, const char *accountType);
 
-// // =====================================================
-// // TRANSACTION DISPLAY FUNCTIONS
-// // =====================================================
+// =====================================================
+// TRANSACTION DISPLAY FUNCTIONS
+// =====================================================
 // void showTransactionHeader();
 // void showSelectedAccount(int accountId, const char* accountType, double balance);
-// void showTransactionSummary(int accountId, const char* transactionType, 
-//                            double amount, double currentBalance, double newBalance);
+void showTransactionSummary(int accountId, const char* transactionType, 
+                           double amount, double currentBalance, double newBalance);
 // void showTransactionResult(int accountId, const char* transactionType, double amount, double newBalance);
 
 // // =====================================================
