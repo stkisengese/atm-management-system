@@ -94,23 +94,37 @@ void showAccountTypeMenu()
     printf("═══════════════════════════════════════════════════════════════\n");
 }
 
-// void showTransactionMenu()
-// {
-//     printf("\n═══════════════════════════════════════════════════════════════\n");
-//     printf("Transaction Options:\n");
-//     printf("[1] Deposit Money\n");
-//     printf("[2] Withdraw Money\n");
-//     printf("═══════════════════════════════════════════════════════════════\n");
-// }
+void showTransactionMenu(int selectedAccountId, const char *accountType, 
+                         double currentBalance)
+{
+    printf("\t\t\t===== Make Transaction =====\n");
+    printf("\n✔ Selected Account ID: %d (%s)\n", selectedAccountId, accountType);
+    printf("Current Balance: $%.2f\n", currentBalance);
+    printf("\n═══════════════════════════════════════════════════════════════\n");
+    printf("Transaction Options:\n");
+    printf("[1] Deposit Money\n");
+    printf("[2] Withdraw Money\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+}
 
-// void showUpdateMenu()
-// {
-//     printf("\n═══════════════════════════════════════════════════════════════\n");
-//     printf("What would you like to update?\n");
-//     printf("[1] Country\n");
-//     printf("[2] Phone number\n");
-//     printf("═══════════════════════════════════════════════════════════════\n");
-// }
+void showUpdateMenu(int selectedAccountId, const char *country, const char *phoneNumber)
+{
+    printf("\t\t\t===== Update Account Information =====\n");
+    printf("\n✔ Selected Account ID: %d\n", selectedAccountId);
+    showUpdateDetails(country, phoneNumber);
+    printf("\n═══════════════════════════════════════════════════════════════\n");
+    printf("What would you like to update?\n");
+    printf("[1] Country\n");
+    printf("[2] Phone number\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+}
+
+void showUpdateDetails(const char *country, const char *phone)
+{
+    printf("    Country: %s\n", country);
+    printf("    Phone: %s\n", phone);
+    printf("───────────────────────────────────────────────────────────────\n");
+}
 
 // =====================================================
 // ACCOUNT DISPLAY FUNCTIONS
@@ -233,9 +247,9 @@ void showAccountDetails(int accountId, const char *depositDate, const char *coun
     printf("═══════════════════════════════════════════════════════════════\n");
 }
 
-// // =====================================================
-// // TRANSACTION DISPLAY FUNCTIONS
-// // =====================================================
+// =====================================================
+// TRANSACTION DISPLAY FUNCTIONS
+// =====================================================
 
 // void showTransactionHeader()
 // {
@@ -248,17 +262,17 @@ void showAccountDetails(int accountId, const char *depositDate, const char *coun
 //     printf("Current Balance: $%.2f\n", balance);
 // }
 
-// void showTransactionSummary(int accountId, const char* transactionType, 
-//                            double amount, double currentBalance, double newBalance)
-// {
-//     printf("\n═══════════════ Transaction Summary ═══════════════\n");
-//     printf("Account ID      : %d\n", accountId);
-//     printf("Transaction Type: %s\n", transactionType);
-//     printf("Amount          : $%.2f\n", amount);
-//     printf("Current Balance : $%.2f\n", currentBalance);
-//     printf("New Balance     : $%.2f\n", newBalance);
-//     printf("═══════════════════════════════════════════════════\n");
-// }
+void showTransactionSummary(int accountId, const char* transactionType, 
+                           double amount, double currentBalance, double newBalance)
+{
+    printf("\n═══════════════ Transaction Summary ═══════════════\n");
+    printf("Account ID      : %d\n", accountId);
+    printf("Transaction Type: %s\n", transactionType);
+    printf("Amount          : $%.2f\n", amount);
+    printf("Current Balance : $%.2f\n", currentBalance);
+    printf("New Balance     : $%.2f\n", newBalance);
+    printf("═══════════════════════════════════════════════════\n");
+}
 
 // void showTransactionResult(int accountId, const char* transactionType, double amount, double newBalance)
 // {
