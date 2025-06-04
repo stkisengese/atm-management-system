@@ -9,20 +9,28 @@ void clearScreen()
     system("clear");
 }
 
-void showWelcomeMessage()
+void showATMHeader()
 {
-    printf("\t\t\t===== Welcome to ATM System =====\n");
+    printf("\n\t\t\t╔══════════════════════════╗\n");
+    printf("\t\t\t║         ATM SYSTEM       ║\n");
+    printf("\t\t\t╚══════════════════════════╝\n");
 }
+
+// void showWelcomeMessage()
+// {
+//     printf("\t\t\t===== Welcome to ATM System =====\n");
+// }
 
 void showSuccessMessage()
 {
     printf("\n✔ Success!\n\n");
 }
 
-// void showErrorMessage(const char* message)
-// {
-//     printf("\n✖ %s\n", message);
-// }
+void showErrorMessage(const char* message)
+{
+    printf("\n\t\t ✖ %s\n", message);
+    sleep(2);
+}
 
 void showWarningMessage(const char* message)
 {
@@ -36,28 +44,43 @@ void showInfoMessage(const char* message)
 
 void showThankYouMessage()
 {
-    printf("Thank you for using our ATM system!\n");
+    printf("\n\t\t Thank you for using our ATM system!\n");
+    printf("\t\t Exiting...\n\n");
+    closeDatabase();
+    exit(0);
 }
 
 // =====================================================
 // MENU DISPLAY FUNCTIONS
 // =====================================================
 
-// void showMainMenu()
-// {
-//     printf("\n═══════════════════════════════════════════════════════════════\n");
-//     printf("                         MAIN MENU\n");
-//     printf("═══════════════════════════════════════════════════════════════\n");
-//     printf("[1] Create New Account\n");
-//     printf("[2] Update Account Information\n");
-//     printf("[3] Check Account Details\n");
-//     printf("[4] Check All Accounts\n");
-//     printf("[5] Make Transaction\n");
-//     printf("[6] Remove Account\n");
-//     printf("[7] Transfer Account Ownership\n");
-//     printf("[8] Exit\n");
-//     printf("═══════════════════════════════════════════════════════════════\n");
-// }
+void showMainMenu(struct User u)
+{
+    printf("\n\t\t Welcome back, %s!\n", u.name);
+    printf("\n\t\t-->> Feel free to choose one of the options below <<--\n\n");
+    printf("\t\t╔═══════════════════════════════════════════╗\n");
+    printf("\t\t║  [1] - Create a new account               ║\n");
+    printf("\t\t║  [2] - Update account information         ║\n");
+    printf("\t\t║  [3] - Check accounts                     ║\n");
+    printf("\t\t║  [4] - Check list of owned account        ║\n");
+    printf("\t\t║  [5] - Make Transaction                   ║\n");
+    printf("\t\t║  [6] - Remove existing account            ║\n");
+    printf("\t\t║  [7] - Transfer ownership                 ║\n");
+    printf("\t\t║  [8] - Logout (Switch User)               ║\n");
+    printf("\t\t║  [9] - Exit System                        ║\n");
+    printf("\t\t╚═══════════════════════════════════════════╝\n");
+}
+
+void showLoginMenu() 
+{
+    printf("\n\t\t Welcome to the ATM System\n");
+    printf("\t\t Please select an option:\n\n");
+    printf("\t\t╔══════════════════════════════════╗\n");
+    printf("\t\t║  [1] - Login to existing account ║\n");
+    printf("\t\t║  [2] - Register new user         ║\n");
+    printf("\t\t║  [3] - Exit system               ║\n");
+    printf("\t\t╚══════════════════════════════════╝\n");
+}
 
 void showAccountTypeMenu()
 {
