@@ -378,7 +378,6 @@ void checkAllAccounts(struct User u)
 
     success(u);
 }
-
 void updateAccountInfo(struct User u)
 {
     sqlite3 *db = getDatabase();
@@ -387,6 +386,8 @@ void updateAccountInfo(struct User u)
     int updateChoice;
     char newValue[100];
     int accountIds[100]; // Array to store account IDs
+    char countries[100][100]; // Array to store countries
+    char phones[100][100]; // Array to store phone numbers
     int accountCount = 0;
 
     clearScreen();
@@ -409,16 +410,26 @@ void updateAccountInfo(struct User u)
     printf("\nYour accounts:\n");
     printf("═══════════════════════════════════════════════════════════════\n");
     int found = 0;
+    
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && accountCount < 100)
     {
         found = 1;
+        accountIds[accountCount] = sqlite3_column_int(stmt, 0); // Store account ID
+        
+        const char *country = (const char *)sqlite3_column_text(stmt, 1);
+        const char *phone = (const char *)sqlite3_column_text(stmt, 2);
+        
+        // Copy the data to our arrays
+        strncpy(countries[accountCount], country ? country : "", sizeof(countries[accountCount]) - 1);
+        countries[accountCount][sizeof(countries[accountCount]) - 1] = '\0';
+        
+        strncpy(phones[accountCount], phone ? phone : "", sizeof(phones[accountCount]) - 1);
+        phones[accountCount][sizeof(phones[accountCount]) - 1] = '\0';
+        
         accountCount++;
-        accountIds[accountCount - 1] = sqlite3_column_int(stmt, 0); // Store account ID
-
+        
         printf("[%d] Account ID: %d\n", accountCount, accountIds[accountCount - 1]);
-        printf("    Country: %s\n", sqlite3_column_text(stmt, 1));
-        printf("    Phone: %s\n", sqlite3_column_text(stmt, 2));
-        printf("───────────────────────────────────────────────────────────────\n");
+        showUpdateDetails(countries[accountCount - 1], phones[accountCount - 1]);
     }
     sqlite3_finalize(stmt);
 
@@ -449,13 +460,11 @@ void updateAccountInfo(struct User u)
 
     // Display selection options
     int selectedAccountId = accountIds[accountChoice - 1];
-    printf("\n✔ Selected Account ID: %d\n", selectedAccountId);
-    printf("\n═══════════════════════════════════════════════════════════════\n");
-    printf("What would you like to update?\n");
-    printf("[1] Country\n");
-    printf("[2] Phone number\n");
-    printf("═══════════════════════════════════════════════════════════════\n");
+    const char *country = countries[accountChoice - 1];
+    const char *phone = phones[accountChoice - 1];
 
+    clearScreen();
+    showUpdateMenu(selectedAccountId, country, phone);
     do
     {
         if (!safeIntInput(&updateChoice, "\nEnter your choice (1 or 2): "))
@@ -466,8 +475,7 @@ void updateAccountInfo(struct User u)
 
         if (updateChoice != 1 && updateChoice != 2)
         {
-            printf("✖ Invalid choice! Please select 1 or 2.\n");
-            sleep(2);
+            showValidationError("choice", "Please select 1 or 2.");
             continue;
         }
         break;
@@ -497,7 +505,7 @@ void updateAccountInfo(struct User u)
         sqlite3_bind_text(stmt, 1, newValue, -1, SQLITE_STATIC);
         sqlite3_bind_int(stmt, 2, selectedAccountId);
         sqlite3_bind_int(stmt, 3, u.id);
-        printf("\n→ Updating country from previous value to: %s\n", newValue);
+        printf("\n→ Updating country from %s to: %s\n", country, newValue);
     }
     else if (updateChoice == 2)
     {
@@ -523,7 +531,7 @@ void updateAccountInfo(struct User u)
         sqlite3_bind_text(stmt, 1, newValue, -1, SQLITE_STATIC);
         sqlite3_bind_int(stmt, 2, selectedAccountId);
         sqlite3_bind_int(stmt, 3, u.id);
-        printf("\n→ Updating phone number from previous value to: %s\n", newValue);
+        printf("\n→ Updating phone number from %s to: %s\n", phone, newValue);
     }
 
     rc = sqlite3_step(stmt);
@@ -701,9 +709,7 @@ void makeTransaction(struct User u)
 
     if (!found)
     {
-        printf("No accounts available for transactions!\n");
-        printf("Note: Fixed accounts (fixed01, fixed02, fixed03) do not allow transactions.\n");
-        sleep(3);
+        showErrorMessage("No accounts available for transactions!");
         mainMenu(u);
         return;
     }
@@ -751,25 +757,14 @@ void makeTransaction(struct User u)
     // Check if account is fixed type
     if (isFixedAccount(accountType))
     {
-        printf("✖ Transactions are not allowed on fixed accounts (fixed01, fixed02, fixed03)!\n");
-        sleep(3);
+        showErrorMessage("Transactions are not allowed on fixed accounts (fixed01, fixed02, fixed03)!");
         mainMenu(u);
         return;
     }
 
     // Display selected account info
-    system("clear");
-    printf("\t\t\t===== Make Transaction =====\n");
-    printf("\n✔ Selected Account ID: %d (%s)\n", selectedAccountId, accountType);
-    printf("Current Balance: $%.2f\n", currentBalance);
-
-    // Transaction type selection
-    printf("\n═══════════════════════════════════════════════════════════════\n");
-    printf("Transaction Options:\n");
-    printf("[1] Deposit Money\n");
-    printf("[2] Withdraw Money\n");
-    printf("═══════════════════════════════════════════════════════════════\n");
-
+    clearScreen();
+    showTransactionMenu(selectedAccountId, accountType, currentBalance);
     do
     {
         if (!safeIntInput(&transactionType, "\nEnter your choice (1 or 2): "))
@@ -780,8 +775,7 @@ void makeTransaction(struct User u)
 
         if (transactionType != 1 && transactionType != 2)
         {
-            printf("✖ Invalid transaction type! Please choose 1 or 2.\n");
-            sleep(2);
+            showValidationError("transaction type", "Please select 1 or 2.");
             continue;
         }
         break;
@@ -832,14 +826,8 @@ void makeTransaction(struct User u)
     }
 
     // Show transaction summary before confirmation
-    printf("\n═══════════════ Transaction Summary ═══════════════\n");
-    printf("Account ID      : %d\n", selectedAccountId);
-    printf("Transaction Type: %s\n", (transactionType == 1) ? "Deposit" : "Withdrawal");
-    printf("Amount          : $%.2f\n", amount);
-    printf("Current Balance : $%.2f\n", currentBalance);
-    printf("New Balance     : $%.2f\n", newBalance);
-    printf("═══════════════════════════════════════════════════\n");
-
+    const char *transactionTypeStr = (transactionType == 1) ? "Deposit" : "Withdrawal";
+    showTransactionSummary(selectedAccountId, transactionTypeStr, amount, currentBalance, newBalance);
     int confirm;
     do
     {
@@ -851,15 +839,13 @@ void makeTransaction(struct User u)
 
         if (confirm == 2)
         {
-            printf("Transaction cancelled.\n");
-            sleep(2);
+            showErrorMessage("Transaction cancelled by user.");
             mainMenu(u);
             return;
         }
         else if (confirm != 1)
         {
-            printf("✖ Invalid choice! Please enter 1 for Yes or 2 for No.\n");
-            sleep(2);
+            showValidationError("choice", "Please enter 1 for Yes or 2 for No.");
             continue;
         }
         break;
