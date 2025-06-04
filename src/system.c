@@ -389,7 +389,7 @@ void updateAccountInfo(struct User u)
     int accountIds[100]; // Array to store account IDs
     int accountCount = 0;
 
-    system("clear");
+    clearScreen();
     printf("\t\t\t===== Update Account Information =====\n");
 
     // First, show user's accounts with selection numbers
@@ -424,8 +424,7 @@ void updateAccountInfo(struct User u)
 
     if (!found)
     {
-        printf("No accounts found!\n");
-        sleep(2);
+        showErrorMessage("No accounts found for your user ID.");
         mainMenu(u);
         return;
     }
@@ -498,7 +497,6 @@ void updateAccountInfo(struct User u)
         sqlite3_bind_text(stmt, 1, newValue, -1, SQLITE_STATIC);
         sqlite3_bind_int(stmt, 2, selectedAccountId);
         sqlite3_bind_int(stmt, 3, u.id);
-
         printf("\n→ Updating country from previous value to: %s\n", newValue);
     }
     else if (updateChoice == 2)
@@ -551,7 +549,7 @@ void checkAccountDetails(struct User u)
     int accountIds[100]; // Array to store account IDs
     int accountCount = 0;
 
-    system("clear");
+    clearScreen();
     printf("\t\t\t===== Check Account Details =====\n");
 
     // First, show user's accounts with selection numbers
@@ -589,8 +587,7 @@ void checkAccountDetails(struct User u)
 
     if (!found)
     {
-        printf("No accounts found!\n");
-        sleep(2);
+        showErrorMessage("No accounts found for your user ID.");
         mainMenu(u);
         return;
     }
@@ -633,29 +630,24 @@ void checkAccountDetails(struct User u)
     rc = sqlite3_step(stmt);
     if (rc == SQLITE_ROW)
     {
-        system("clear");
-        printf("\t\t\t===== Check Account Details =====\n");
-        printf("\n════════════════════ Account Details ═════════════════════\n");
-        printf("Account Number : %d\n", sqlite3_column_int(stmt, 0));
-        printf("Deposit Date   : %s\n", sqlite3_column_text(stmt, 1));
-        printf("Country        : %s\n", sqlite3_column_text(stmt, 2));
-        printf("Phone Number   : %s\n", sqlite3_column_text(stmt, 3));
-        printf("Balance        : $%.2f\n", sqlite3_column_double(stmt, 4));
-        printf("Account Type   : %s\n", sqlite3_column_text(stmt, 5));
-        printf("═══════════════════════════════════════════════════════════════\n");
-
-        const char *accountType = (const char *)sqlite3_column_text(stmt, 5);
-        double balance = sqlite3_column_double(stmt, 4);
+        // Retrieve account details
+        int accountId = sqlite3_column_int(stmt, 0);
         const char *depositDate = (const char *)sqlite3_column_text(stmt, 1);
-        displayInterestInfo(accountType, balance, depositDate);
+        const char *country = (const char *)sqlite3_column_text(stmt, 2);
+        const char *phone = (const char *)sqlite3_column_text(stmt, 3);
+        double balance = sqlite3_column_double(stmt, 4);
+        const char *accountType = (const char *)sqlite3_column_text(stmt, 5);
+
+        clearScreen();
+        showAccountDetails(accountId, depositDate, country, phone, balance, accountType);
+        displayInterestInfo(accountType, balance, depositDate); // Display interest information
         sqlite3_finalize(stmt);
         success(u);
     }
     else
     {
         sqlite3_finalize(stmt);
-        printf("✖ Error retrieving account details.\n");
-        sleep(2);
+        showErrorMessage("Error retrieving account details.");
         mainMenu(u);
     }
 }
