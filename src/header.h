@@ -112,8 +112,8 @@ void showAccountTypeInfo(int accountTypeChoice);
 //                         const char* phone, double balance);
 // void showPortfolioSummary(int totalAccounts, double totalBalance);
 // void showNoAccountsMessage(const char* userName);
-// void showAccountDetails(int accountId, const char* depositDate, const char* country,
-//                        const char* phone, double balance, const char* accountType);
+void showAccountDetails(int accountId, const char *depositDate, const char *country,
+                       const char *phone, double balance, const char *accountType);
 
 // // =====================================================
 // // TRANSACTION DISPLAY FUNCTIONS
