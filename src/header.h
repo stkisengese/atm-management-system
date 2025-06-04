@@ -105,7 +105,7 @@ void showAccountTypeMenu();
 // ACCOUNT DISPLAY FUNCTIONS
 // =====================================================
 void showAccountCreationHeader();
-// void showAccountTypeInfo(int accountTypeChoice);
+void showAccountTypeInfo(int accountTypeChoice);
 // void showAccountPortfolioHeader(const char* userName);
 // void showAccountListItem(int itemNumber, int accountId, const char* accountType, 
 //                         const char* depositDate, const char* country, 
