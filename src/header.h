@@ -84,7 +84,8 @@ void displayInterestInfo(const char *accountType, double balance, const char *de
 // GENERAL DISPLAY FUNCTIONS
 // =====================================================
 void clearScreen();
-void showWelcomeMessage();
+void showATMHeader();
+// void showWelcomeMessage();
 void showSuccessMessage();
 void showErrorMessage(const char* message);
 void showWarningMessage(const char* message);
@@ -94,7 +95,8 @@ void showThankYouMessage();
 // =====================================================
 // MENU DISPLAY FUNCTIONS
 // =====================================================
-// void showMainMenu();
+void showMainMenu(struct User u);
+void showLoginMenu();
 void showAccountTypeMenu();
 // void showTransactionMenu();
 // void showUpdateMenu();
