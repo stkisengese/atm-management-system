@@ -75,11 +75,11 @@ void showLoginMenu()
 {
     printf("\n\t\t Welcome to the ATM System\n");
     printf("\t\t Please select an option:\n\n");
-    printf("\t\t╔══════════════════════════════════╗\n");
-    printf("\t\t║  [1] - Login to existing account ║\n");
-    printf("\t\t║  [2] - Register new user         ║\n");
-    printf("\t\t║  [3] - Exit system               ║\n");
-    printf("\t\t╚══════════════════════════════════╝\n");
+    printf("\t\t╔═══════════════════════════════════════════╗\n");
+    printf("\t\t║  [1] - Login to existing account          ║\n");
+    printf("\t\t║  [2] - Register new user                  ║\n");
+    printf("\t\t║  [3] - Exit system                        ║\n");
+    printf("\t\t╚═══════════════════════════════════════════╝\n");
 }
 
 void showAccountTypeMenu()
