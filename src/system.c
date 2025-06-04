@@ -238,28 +238,7 @@ void createNewAcc(struct User u)
         printf("\n✔ Selected Account Type: %s\n", r.accountType);
         
         // Show additional info for fixed accounts
-        if (accountTypeChoice >= 3 && accountTypeChoice <= 5)
-        {
-            int years = accountTypeChoice - 2; // Convert choice to years (3->1, 4->2, 5->3)
-            printf("📌 Note: Fixed deposit account for %d year(s)\n", years);
-            printf("   • Higher interest rate\n");
-            printf("   • No withdrawals/deposits allowed during term\n");
-            printf("   • Funds locked until maturity\n");
-        }
-        else if (accountTypeChoice == 1)
-        {
-            printf("📌 Note: Savings account features:\n");
-            printf("   • Earn interest on deposits\n");
-            printf("   • Suitable for long-term savings\n");
-            printf("   • Flexible deposits and withdrawals\n");
-        }
-        else if (accountTypeChoice == 2)
-        {
-            printf("📌 Note: Current account features:\n");
-            printf("   • Designed for frequent transactions\n");
-            printf("   • No interest earned\n");
-            printf("   • Unlimited deposits and withdrawals\n");
-        }
+        showAccountTypeInfo(accountTypeChoice);
         
         break;
     } while (1);
