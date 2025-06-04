@@ -10,8 +10,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
     invalid:
         if (!safeIntInput(&option, "\nEnter 0 to try again, 1 to return to main menu and 2 to exit: "))
         {
-            printf("✖ Invalid input! Please try again.\n");
-            sleep(2);
+            showRetryMessage();
             goto invalid;
         }
 
@@ -62,8 +61,7 @@ void success(struct User u)
 invalid:
     if (!safeIntInput(&option, "Enter 1 to go to the main menu and 0 to exit: "))
     {
-        printf("✖ Invalid input! Please try again.\n");
-        sleep(2);
+        showRetryMessage();
         goto invalid;
     }
 
@@ -93,8 +91,8 @@ void createNewAcc(struct User u)
     sqlite3_stmt *stmt;
     char input[100];
 
-    system("clear");
-    printf("\t\t\t===== New record =====\n");
+    clearScreen();
+    showAccountCreationHeader();
 
     // Validate date input
     int isValidDate = 0;
@@ -103,22 +101,19 @@ void createNewAcc(struct User u)
         int month, day, year;
         if (!safeIntInput(&month, "\nEnter today's month (mm): "))
         {
-            printf("✖ Invalid input! Please try again.\n");
-            sleep(2);
+            showRetryMessage();
             continue;
         }
 
         if (!safeIntInput(&day, "Enter today's day (dd): "))
         {
-            printf("✖ Invalid input! Please try again.\n");
-            sleep(2);
+            showRetryMessage();
             continue;
         }
 
         if (!safeIntInput(&year, "Enter today's year (yyyy): "))
         {
-            printf("✖ Invalid input! Please try again.\n");
-            sleep(2);
+            showRetryMessage();
             continue;
         }
 
@@ -136,8 +131,7 @@ void createNewAcc(struct User u)
     {
         if (!safeStringInput(input, sizeof(input), "\nEnter the account number: "))
         {
-            printf("✖ Input error! Please try again.\n");
-            sleep(2);
+            showInputErrorMessage();
             continue;
         }
 
@@ -153,8 +147,7 @@ void createNewAcc(struct User u)
         // Check if account already exists
         if (accountExists(r.accountNbr))
         {
-            printf("✖ This Account is already in use. Please choose a different one.\n");
-            sleep(2);
+            showValidationError("account number", "This Account is already in use. Please choose a different one.");
             continue;
         }
 
@@ -167,8 +160,7 @@ void createNewAcc(struct User u)
     {
         if (!safeStringInput(r.country, sizeof(r.country), "\nEnter the country: "))
         {
-            printf("✖ Input error! Please try again.\n");
-            sleep(2);
+            showInputErrorMessage();
             continue;
         }
 
@@ -182,8 +174,7 @@ void createNewAcc(struct User u)
     {
         if (!safeStringInput(input, sizeof(input), "\nEnter the phone number: "))
         {
-            printf("✖ Input error! Please try again.\n");
-            sleep(2);
+            showInputErrorMessage();
             continue;
         }
 
@@ -202,8 +193,7 @@ void createNewAcc(struct User u)
     {
         if (!safeStringInput(input, sizeof(input), "\nEnter amount to deposit: $"))
         {
-            printf("✖ Input error! Please try again.\n");
-            sleep(2);
+            showInputErrorMessage();
             continue;
         }
 
@@ -221,19 +211,10 @@ void createNewAcc(struct User u)
     int accountTypeChoice;
     do
     {
-        printf("\n═══════════════════════════════════════════════════════════════\n");
-        printf("Choose the type of account:\n");
-        printf("[1] Saving Account\n");
-        printf("[2] Current Account\n");
-        printf("[3] Fixed Deposit - 1 Year (fixed01)\n");
-        printf("[4] Fixed Deposit - 2 Years (fixed02)\n");
-        printf("[5] Fixed Deposit - 3 Years (fixed03)\n");
-        printf("═══════════════════════════════════════════════════════════════\n");
-
+        showAccountTypeMenu();
         if (!safeIntInput(&accountTypeChoice, "\nEnter your choice (1-5): "))
         {
-            printf("✖ Invalid input! Please try again.\n");
-            sleep(2);
+            showRetryMessage();
             continue;
         }
 
@@ -256,8 +237,7 @@ void createNewAcc(struct User u)
                 strcpy(r.accountType, "fixed03");
                 break;
             default:
-                printf("✖ Invalid choice! Please select a number between 1 and 5.\n");
-                sleep(2);
+                showValidationError("choice", "Please select a number between 1 and 5.");
                 continue;
         }
 
@@ -483,8 +463,7 @@ void updateAccountInfo(struct User u)
     {
         if (!safeIntInput(&accountChoice, "\nSelect account to update (enter the number): "))
         {
-            printf("✖ Invalid input! Please try again.\n");
-            sleep(2);
+            showRetryMessage();
             continue;
         }
 
@@ -510,8 +489,7 @@ void updateAccountInfo(struct User u)
     {
         if (!safeIntInput(&updateChoice, "\nEnter your choice (1 or 2): "))
         {
-            printf("✖ Invalid input! Please try again.\n");
-            sleep(2);
+            showRetryMessage();
             continue;
         }
 
@@ -531,8 +509,7 @@ void updateAccountInfo(struct User u)
         {
             if (!safeStringInput(newValue, sizeof(newValue), "Enter new country: "))
             {
-                printf("✖ Input error! Please try again.\n");
-                sleep(2);
+                showInputErrorMessage();
                 continue;
             }
 
@@ -559,8 +536,7 @@ void updateAccountInfo(struct User u)
         {
             if (!safeStringInput(newValue, sizeof(newValue), "Enter new phone number: "))
             {
-                printf("✖ Input error! Please try again.\n");
-                sleep(2);
+                showInputErrorMessage();
                 continue;
             }
 
@@ -652,8 +628,7 @@ void checkAccountDetails(struct User u)
     {
         if (!safeIntInput(&accountChoice, "\nSelect account to check details (enter the number): "))
         {
-            printf("✖ Invalid input! Please try again.\n");
-            sleep(2);
+            showRetryMessage();
             continue;
         }
 
@@ -774,8 +749,7 @@ void makeTransaction(struct User u)
     {
         if (!safeIntInput(&accountChoice, "\nSelect account for transaction (enter the number): "))
         {
-            printf("✖ Invalid input! Please try again.\n");
-            sleep(2);
+            showRetryMessage();
             continue;
         }
 
@@ -836,8 +810,7 @@ void makeTransaction(struct User u)
     {
         if (!safeIntInput(&transactionType, "\nEnter your choice (1 or 2): "))
         {
-            printf("✖ Invalid input! Please try again.\n");
-            sleep(2);
+            showRetryMessage();
             continue;
         }
 
@@ -857,8 +830,7 @@ void makeTransaction(struct User u)
     {
         if (!safeStringInput(amountStr, sizeof(amountStr), "Enter amount: $"))
         {
-            printf("✖ Input error! Please try again.\n");
-            sleep(2);
+            showInputErrorMessage();
             continue;
         }
 
@@ -909,8 +881,7 @@ void makeTransaction(struct User u)
     {
         if (!safeIntInput(&confirm, "\nConfirm transaction? [1] Yes [2] No: "))
         {
-            printf("✖ Invalid input! Please try again.\n");
-            sleep(2);
+            showRetryMessage();
             continue;
         }
 
@@ -1014,8 +985,7 @@ void removeAccount(struct User u)
     {
         if (!safeIntInput(&accountChoice, "\nSelect account to remove (enter the number): "))
         {
-            printf("✖ Invalid input! Please try again.\n");
-            sleep(2);
+            showRetryMessage();
             continue;
         }
 
@@ -1088,8 +1058,7 @@ void removeAccount(struct User u)
     {
         if (!safeIntInput(&deleteChoice, "\nEnter your choice (1 or 2): "))
         {
-            printf("✖ Invalid input! Please try again.\n");
-            sleep(2);
+            showRetryMessage();
             continue;
         }
 
@@ -1115,8 +1084,7 @@ void removeAccount(struct User u)
     {
         if (!safeStringInput(confirmation, sizeof(confirmation), "Type 'DELETE' to confirm permanent deletion: "))
         {
-            printf("✖ Input error! Please try again.\n");
-            sleep(2);
+            showInputErrorMessage();
             continue;
         }
 
@@ -1230,8 +1198,7 @@ void transferOwnership(struct User u)
     {
         if (!safeIntInput(&accountChoice, "\nSelect account to transfer (enter the number): "))
         {
-            printf("✖ Invalid input! Please try again.\n");
-            sleep(2);
+            showRetryMessage();
             continue;
         }
 
@@ -1295,8 +1262,7 @@ void transferOwnership(struct User u)
     {
         if (!safeStringInput(targetUsername, sizeof(targetUsername), "\nEnter recipient's username: "))
         {
-            printf("✖ Input error! Please try again.\n");
-            sleep(2);
+            showInputErrorMessage();
             continue;
         }
 
@@ -1371,8 +1337,7 @@ void transferOwnership(struct User u)
     {
         if (!safeIntInput(&transferChoice, "\nEnter your choice (1 or 2): "))
         {
-            printf("✖ Invalid input! Please try again.\n");
-            sleep(2);
+            showRetryMessage();
             continue;
         }
 
@@ -1399,8 +1364,7 @@ void transferOwnership(struct User u)
     {
         if (!safeStringInput(confirmation, sizeof(confirmation), "Type 'TRANSFER' to confirm ownership transfer: "))
         {
-            printf("✖ Input error! Please try again.\n");
-            sleep(2);
+            showInputErrorMessage();
             continue;
         }
 
