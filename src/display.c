@@ -121,35 +121,35 @@ void showAccountCreationHeader()
     printf("\t\t\t===== New record =====\n");
 }
 
-// void showAccountTypeInfo(int accountTypeChoice)
-// {
-//     switch (accountTypeChoice)
-//     {
-//         case 1:
-//             printf("📌 Note: Savings account features:\n");
-//             printf("   • Earn interest on deposits\n");
-//             printf("   • Suitable for long-term savings\n");
-//             printf("   • Flexible deposits and withdrawals\n");
-//             break;
-//         case 2:
-//             printf("📌 Note: Current account features:\n");
-//             printf("   • Designed for frequent transactions\n");
-//             printf("   • No interest earned\n");
-//             printf("   • Unlimited deposits and withdrawals\n");
-//             break;
-//         case 3:
-//         case 4:
-//         case 5:
-//             {
-//                 int years = accountTypeChoice - 2;
-//                 printf("📌 Note: Fixed deposit account for %d year(s)\n", years);
-//                 printf("   • Higher interest rate\n");
-//                 printf("   • No withdrawals/deposits allowed during term\n");
-//                 printf("   • Funds locked until maturity\n");
-//             }
-//             break;
-//     }
-// }
+void showAccountTypeInfo(int accountTypeChoice)
+{
+    switch (accountTypeChoice)
+    {
+        case 1:
+            printf("📌 Note: Savings account features:\n");
+            printf("   • Earn interest on deposits\n");
+            printf("   • Suitable for long-term savings\n");
+            printf("   • Flexible deposits and withdrawals\n");
+            break;
+        case 2:
+            printf("📌 Note: Current account features:\n");
+            printf("   • Designed for frequent transactions\n");
+            printf("   • No interest earned\n");
+            printf("   • Unlimited deposits and withdrawals\n");
+            break;
+        case 3:
+        case 4:
+        case 5:
+            {
+                int years = accountTypeChoice - 2;
+                printf("📌 Note: Fixed deposit account for %d year(s)\n", years);
+                printf("   • Higher interest rate\n");
+                printf("   • No withdrawals/deposits allowed during term\n");
+                printf("   • Funds locked until maturity\n");
+            }
+            break;
+    }
+}
 
 // void showAccountPortfolioHeader(const char* userName)
 // {
