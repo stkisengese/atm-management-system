@@ -5,7 +5,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
     int option;
     if (notGood == 0)
     {
-        system("clear");
+        clearScreen();
         printf("\n✖ Record not found!!\n");
     invalid:
         if (!safeIntInput(&option, "\nEnter 0 to try again, 1 to return to main menu and 2 to exit: "))
@@ -25,8 +25,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
         }
         else
         {
-            printf("✖ Invalid operation! Please choose 0, 1, or 2.\n");
-            sleep(2);
+            showValidationError("operation", "Please choose 1, 2, or 3.");
             goto invalid;
         }
     }
@@ -34,8 +33,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
     {
         if (!safeIntInput(&option, "\nEnter 1 to go to the main menu and 0 to exit: "))
         {
-            printf("✖ Invalid input! Returning to main menu.\n");
-            sleep(2);
+            showRetryMessage();
             option = 1;
         }
     }
@@ -48,9 +46,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
     else
     {
         system("clear");
-        printf("Thank you for using our ATM system!\n");
-        closeDatabase();
-        exit(0);
+        showThankYouMessage();
     }
 }
 
@@ -72,14 +68,11 @@ invalid:
     }
     else if (option == 0)
     {
-        printf("Thank you for using our ATM system!\n");
-        closeDatabase();
-        exit(0);
+        showThankYouMessage();
     }
     else
     {
-        printf("✖ Invalid operation! Please choose 1 or 0.\n");
-        sleep(2);
+        showValidationError("operation", "Please choose 1 or 0.");
         goto invalid;
     }
 }
