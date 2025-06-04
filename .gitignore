@@ -15,3 +15,4 @@ atm
 # [3] Build System Artifacts
 *.d                 # Auto-generated dependencies
 Makefile.local      # Local make customizationsss
+.vscode/
