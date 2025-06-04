@@ -8,8 +8,8 @@ SQLITEDIR = sqlite
 TARGET = atm
 
 # Source files
-SOURCES = $(SRCDIR)/main.c $(SRCDIR)/auth.c $(SRCDIR)/system.c $(SRCDIR)/database.c $(SRCDIR)/utils.c $(SQLITEDIR)/sqlite3.c
-OBJECTS = $(OBJDIR)/main.o $(OBJDIR)/auth.o $(OBJDIR)/system.o $(OBJDIR)/database.o $(OBJDIR)/utils.o $(OBJDIR)/sqlite3.o
+SOURCES = $(SRCDIR)/main.c $(SRCDIR)/auth.c $(SRCDIR)/system.c $(SRCDIR)/database.c $(SRCDIR)/utils.c $(SRCDIR)/display.c $(SQLITEDIR)/sqlite3.c
+OBJECTS = $(OBJDIR)/main.o $(OBJDIR)/auth.o $(OBJDIR)/system.o $(OBJDIR)/database.o $(OBJDIR)/utils.o $(OBJDIR)/display.o $(OBJDIR)/sqlite3.o
 
 # Create obj directory if it doesn't exist
 $(shell mkdir -p $(OBJDIR))
@@ -32,6 +32,9 @@ $(OBJDIR)/database.o: $(SRCDIR)/database.c src/header.h
 
 $(OBJDIR)/utils.o: $(SRCDIR)/utils.c src/header.h
 	$(CC) $(CFLAGS) -c $(SRCDIR)/utils.c -o $@
+
+$(OBJDIR)/display.o: $(SRCDIR)/display.c src/header.h
+	$(CC) $(CFLAGS) -c $(SRCDIR)/display.c -o $@
 
 # Special compilation for sqlite3.c (no warnings, different path)
 $(OBJDIR)/sqlite3.o: $(SQLITEDIR)/sqlite3.c
