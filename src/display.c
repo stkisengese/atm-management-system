@@ -219,19 +219,19 @@ void showAccountTypeInfo(int accountTypeChoice)
 //     printf("═══════════════════════════════════════════════════════════════\n");
 // }
 
-// void showAccountDetails(int accountId, const char* depositDate, const char* country,
-//                        const char* phone, double balance, const char* accountType)
-// {
-//     printf("\t\t\t===== Check Account Details =====\n");
-//     printf("\n════════════════════ Account Details ═════════════════════\n");
-//     printf("Account Number : %d\n", accountId);
-//     printf("Deposit Date   : %s\n", depositDate);
-//     printf("Country        : %s\n", country);
-//     printf("Phone Number   : %s\n", phone);
-//     printf("Balance        : $%.2f\n", balance);
-//     printf("Account Type   : %s\n", accountType);
-//     printf("═══════════════════════════════════════════════════════════════\n");
-// }
+void showAccountDetails(int accountId, const char *depositDate, const char *country,
+                       const char *phone, double balance, const char *accountType)
+{
+    printf("\t\t\t===== Check Account Details =====\n");
+    printf("\n════════════════════ Account Details ═════════════════════\n");
+    printf("Account Number : %d\n", accountId);
+    printf("Deposit Date   : %s\n", depositDate);
+    printf("Country        : %s\n", country);
+    printf("Phone Number   : %s\n", phone);
+    printf("Balance        : $%.2f\n", balance);
+    printf("Account Type   : %s\n", accountType);
+    printf("═══════════════════════════════════════════════════════════════\n");
+}
 
 // // =====================================================
 // // TRANSACTION DISPLAY FUNCTIONS
