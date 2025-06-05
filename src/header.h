@@ -108,21 +108,21 @@ void showUpdateDetails(const char *country, const char *phone);
 void showAccountCreationHeader();
 void showAccountTypeInfo(int accountTypeChoice);
 // void showAccountPortfolioHeader(const char* userName);
-// void showAccountListItem(int itemNumber, int accountId, const char* accountType, 
-//                         const char* depositDate, const char* country, 
+// void showAccountListItem(int itemNumber, int accountId, const char* accountType,
+//                         const char* depositDate, const char* country,
 //                         const char* phone, double balance);
 // void showPortfolioSummary(int totalAccounts, double totalBalance);
 // void showNoAccountsMessage(const char* userName);
 void showAccountDetails(int accountId, const char *depositDate, const char *country,
-                       const char *phone, double balance, const char *accountType);
+                        const char *phone, double balance, const char *accountType);
 
 // =====================================================
 // TRANSACTION DISPLAY FUNCTIONS
 // =====================================================
 // void showTransactionHeader();
 // void showSelectedAccount(int accountId, const char* accountType, double balance);
-void showTransactionSummary(int accountId, const char* transactionType, 
-                           double amount, double currentBalance, double newBalance);
+void showTransactionSummary(int accountId, const char *transactionType,
+                            double amount, double currentBalance, double newBalance);
 // void showTransactionResult(int accountId, const char* transactionType, double amount, double newBalance);
 
 // // =====================================================
@@ -134,11 +134,11 @@ void showTransactionSummary(int accountId, const char* transactionType,
 // // =====================================================
 // // REMOVAL DISPLAY FUNCTIONS
 // // =====================================================
-// void showRemovalHeader();
-// void showRemovalWarning(int accountId, const char* depositDate, const char* country,
-//                        const char* phone, double balance, const char* accountType);
-// void showRemovalConfirmationMenu();
-// void showRemovalSuccess(int accountId, double balance);
+void showRemovalHeader();
+void showRemovalWarning(int accountId, const char *depositDate, const char *country,
+                        const char *phone, double balance, const char *accountType);
+void showRemovalConfirmationMenu();
+void showRemovalSuccess(int accountId, double balance);
 
 // // =====================================================
 // // TRANSFER DISPLAY FUNCTIONS
@@ -164,21 +164,23 @@ void showInputErrorMessage();
 // // PROGRESS AND STATUS FUNCTIONS
 // // =====================================================
 // void showProcessingMessage(const char* action);
-// void showDivider();
-// void showShortDivider();
+void showDivider();
+void showShortDivider();
 
 // =====================================================
 // VALIDATION MESSAGE FUNCTIONS
 // =====================================================
-void showValidationError(const char* field, const char* requirement);
-// void showConfirmationPrompt(const char* action);
+void showValidationError(const char *field, const char *requirement);
+void showInvalidSelectionError(int maxCount);
+void showCancelledAction(const char *action, struct User u);
+void showConfirmationInput(const char *action);
 
 // // =====================================================
 // // ACCOUNT SELECTION FUNCTIONS
 // // =====================================================
-// void showAccountSelectionHeader(const char* action);
+void showAccountSelectionHeader();
 // void showSimpleAccountItem(int itemNumber, int accountId, const char* accountType, double balance);
-// void showAccountItemWithDetails(int itemNumber, int accountId, const char* accountType, 
-//                                double balance, const char* country, const char* phone);
+void showAccountItemWithDetails(int itemNumber, int accountId, const char *accountType,
+                                double balance, const char *country, const char *phone);
 
 #endif // HEADER_H
