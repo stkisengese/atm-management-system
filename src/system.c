@@ -451,8 +451,7 @@ void updateAccountInfo(struct User u)
 
         if (accountChoice < 1 || accountChoice > accountCount)
         {
-            printf("✖ Invalid selection! Please choose a number between 1 and %d.\n", accountCount);
-            sleep(2);
+            showConfirmationInput(accountCount);
             continue;
         }
         break;
@@ -609,8 +608,7 @@ void checkAccountDetails(struct User u)
 
         if (accountChoice < 1 || accountChoice > accountCount)
         {
-            printf("✖ Invalid selection! Please choose a number between 1 and %d.\n", accountCount);
-            sleep(2);
+            showConfirmationInput(accountCount);
             continue;
         }
         break;
@@ -723,8 +721,7 @@ void makeTransaction(struct User u)
 
         if (accountChoice < 1 || accountChoice > accountCount)
         {
-            printf("✖ Invalid selection! Please choose a number between 1 and %d.\n", accountCount);
-            sleep(2);
+            showConfirmationInput(accountCount);
             continue;
         }
         break;
