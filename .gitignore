@@ -5,6 +5,7 @@ atm             # Final binary
 *.dylib             # macOS dynamic libraries
 data
 sqlite3.*
+*.db
 
 # [2] Object Files
 **/*.o
