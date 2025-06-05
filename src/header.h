@@ -140,16 +140,17 @@ void showRemovalWarning(int accountId, const char *depositDate, const char *coun
 void showRemovalConfirmationMenu();
 void showRemovalSuccess(int accountId, double balance);
 
-// // =====================================================
-// // TRANSFER DISPLAY FUNCTIONS
-// // =====================================================
-// void showTransferHeader();
-// void showTransferConfirmation(int accountId, const char* accountType, double balance,
-//                              const char* country, const char* phone, const char* depositDate,
-//                              const char* fromUser, const char* toUser);
-// void showTransferConfirmationMenu();
-// void showTransferSuccess(int accountId, const char* accountType, double balance,
-//                         const char* fromUser, const char* toUser);
+// =====================================================
+// TRANSFER DISPLAY FUNCTIONS
+// =====================================================
+void showTransferHeader();
+void showTransferAccountDisplay(int accountId, const char *accountType, double balance);
+void showTransferConfirmation(int accountId, const char *accountType, double balance,
+                              const char *country, const char *phone, const char *depositDate,
+                              const char *fromUser, const char *toUser);
+void showTransferConfirmationMenu();
+void showTransferSuccess(int accountId, const char *accountType, double balance,
+                         const char *fromUser, const char *toUser);
 
 // =====================================================
 // INPUT PROMPT FUNCTIONS
