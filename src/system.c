@@ -385,16 +385,14 @@ void updateAccountInfo(struct User u)
     int accountChoice;
     int updateChoice;
     char newValue[100];
-    int accountIds[100];      // Array to store account IDs
-    char countries[100][100]; // Array to store countries
-    char phones[100][100];    // Array to store phone numbers
+    int accountIds[100]; // Array to store account IDs
     int accountCount = 0;
 
     clearScreen();
     printf("\t\t\t===== Update Account Information =====\n");
 
     // First, show user's accounts with selection numbers
-    char list_sql[] = "SELECT account_id, country, phone FROM records WHERE user_id = ?";
+    char list_sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE user_id = ?";
     int rc = sqlite3_prepare_v2(db, list_sql, -1, &stmt, NULL);
 
     if (rc != SQLITE_OK)
@@ -409,26 +407,16 @@ void updateAccountInfo(struct User u)
 
     showAccountSelectionHeader();
     int found = 0;
-
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && accountCount < 100)
     {
         found = 1;
-        accountIds[accountCount] = sqlite3_column_int(stmt, 0); // Store account ID
-
-        const char *country = (const char *)sqlite3_column_text(stmt, 1);
-        const char *phone = (const char *)sqlite3_column_text(stmt, 2);
-
-        // Copy the data to our arrays
-        strncpy(countries[accountCount], country ? country : "", sizeof(countries[accountCount]) - 1);
-        countries[accountCount][sizeof(countries[accountCount]) - 1] = '\0';
-
-        strncpy(phones[accountCount], phone ? phone : "", sizeof(phones[accountCount]) - 1);
-        phones[accountCount][sizeof(phones[accountCount]) - 1] = '\0';
-
         accountCount++;
-
-        printf("[%d] Account ID: %d\n", accountCount, accountIds[accountCount - 1]);
-        showUpdateDetails(countries[accountCount - 1], phones[accountCount - 1]);
+        accountIds[accountCount - 1] = sqlite3_column_int(stmt, 0); // Store account ID
+        showAccountItemWithDetails(accountCount, accountIds[accountCount - 1],
+                                   (const char *)sqlite3_column_text(stmt, 5),  // account type
+                                   sqlite3_column_double(stmt, 4),              // account balance
+                                   (const char *)sqlite3_column_text(stmt, 2),  // country
+                                   (const char *)sqlite3_column_text(stmt, 3)); // phone number
     }
     sqlite3_finalize(stmt);
 
@@ -456,11 +444,39 @@ void updateAccountInfo(struct User u)
         break;
     } while (1);
 
-    // Display selection options
     int selectedAccountId = accountIds[accountChoice - 1];
-    const char *country = countries[accountChoice - 1];
-    const char *phone = phones[accountChoice - 1];
 
+    // Get detailed account information for the selected account
+    char detail_sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE account_id = ? AND user_id = ?";
+    rc = sqlite3_prepare_v2(db, detail_sql, -1, &stmt, NULL);
+
+    if (rc != SQLITE_OK)
+    {
+        printf("Database error: %s\n", sqlite3_errmsg(db));
+        sleep(2);
+        mainMenu(u);
+        return;
+    }
+
+    sqlite3_bind_int(stmt, 1, selectedAccountId);
+    sqlite3_bind_int(stmt, 2, u.id);
+
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_ROW)
+    {
+        sqlite3_finalize(stmt);
+        showErrorMessage("Account not found!");
+        mainMenu(u);
+        return;
+    }
+
+    // Store account details
+    char country[100], phone[100];
+    strcpy(country, (const char *)sqlite3_column_text(stmt, 2));
+    strcpy(phone, (const char *)sqlite3_column_text(stmt, 3));
+    sqlite3_finalize(stmt);
+
+    // Display update options
     clearScreen();
     showUpdateMenu(selectedAccountId, country, phone);
     do
