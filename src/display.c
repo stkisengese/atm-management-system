@@ -457,11 +457,6 @@ void showInputErrorMessage()
 // // PROGRESS AND STATUS FUNCTIONS
 // // =====================================================
 
-// void showProcessingMessage(const char* action)
-// {
-//     printf("\n→ Processing %s...\n", action);
-// }
-
 void showDivider()
 {
     printf("═══════════════════════════════════════════════════════════════\n");
@@ -502,22 +497,15 @@ void showConfirmationInput(const char *action)
     sleep(3);
 }
 
-// // =====================================================
-// // ACCOUNT SELECTION FUNCTIONS
-// // =====================================================
+// =====================================================
+// ACCOUNT SELECTION FUNCTIONS
+// ===============   ======================================
 
 void showAccountSelectionHeader()
 {
     printf("\nYour accounts:\n");
     showDivider();
 }
-
-// void showSimpleAccountItem(int itemNumber, int accountId, const char* accountType, double balance)
-// {
-//     printf("[%d] Account ID: %d (%s)\n", itemNumber, accountId, accountType);
-//     printf("    Balance: $%.2f\n", balance);
-//     showShortDivider();
-// }
 
 void showAccountItemWithDetails(int itemNumber, int accountId, const char *accountType,
                                 double balance, const char *country, const char *phone)
