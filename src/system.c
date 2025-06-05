@@ -214,32 +214,32 @@ void createNewAcc(struct User u)
         // Map the choice to account type string
         switch (accountTypeChoice)
         {
-            case 1:
-                strcpy(r.accountType, "saving");
-                break;
-            case 2:
-                strcpy(r.accountType, "current");
-                break;
-            case 3:
-                strcpy(r.accountType, "fixed01");
-                break;
-            case 4:
-                strcpy(r.accountType, "fixed02");
-                break;
-            case 5:
-                strcpy(r.accountType, "fixed03");
-                break;
-            default:
-                showValidationError("choice", "Please select a number between 1 and 5.");
-                continue;
+        case 1:
+            strcpy(r.accountType, "saving");
+            break;
+        case 2:
+            strcpy(r.accountType, "current");
+            break;
+        case 3:
+            strcpy(r.accountType, "fixed01");
+            break;
+        case 4:
+            strcpy(r.accountType, "fixed02");
+            break;
+        case 5:
+            strcpy(r.accountType, "fixed03");
+            break;
+        default:
+            showValidationError("choice", "Please select a number between 1 and 5.");
+            continue;
         }
 
         // Show confirmation of selected account type
         printf("\n✔ Selected Account Type: %s\n", r.accountType);
-        
+
         // Show additional info for fixed accounts
         showAccountTypeInfo(accountTypeChoice);
-        
+
         break;
     } while (1);
 
@@ -385,9 +385,9 @@ void updateAccountInfo(struct User u)
     int accountChoice;
     int updateChoice;
     char newValue[100];
-    int accountIds[100]; // Array to store account IDs
+    int accountIds[100];      // Array to store account IDs
     char countries[100][100]; // Array to store countries
-    char phones[100][100]; // Array to store phone numbers
+    char phones[100][100];    // Array to store phone numbers
     int accountCount = 0;
 
     clearScreen();
@@ -410,24 +410,24 @@ void updateAccountInfo(struct User u)
     printf("\nYour accounts:\n");
     printf("═══════════════════════════════════════════════════════════════\n");
     int found = 0;
-    
+
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && accountCount < 100)
     {
         found = 1;
         accountIds[accountCount] = sqlite3_column_int(stmt, 0); // Store account ID
-        
+
         const char *country = (const char *)sqlite3_column_text(stmt, 1);
         const char *phone = (const char *)sqlite3_column_text(stmt, 2);
-        
+
         // Copy the data to our arrays
         strncpy(countries[accountCount], country ? country : "", sizeof(countries[accountCount]) - 1);
         countries[accountCount][sizeof(countries[accountCount]) - 1] = '\0';
-        
+
         strncpy(phones[accountCount], phone ? phone : "", sizeof(phones[accountCount]) - 1);
         phones[accountCount][sizeof(phones[accountCount]) - 1] = '\0';
-        
+
         accountCount++;
-        
+
         printf("[%d] Account ID: %d\n", accountCount, accountIds[accountCount - 1]);
         showUpdateDetails(countries[accountCount - 1], phones[accountCount - 1]);
     }
@@ -573,9 +573,7 @@ void checkAccountDetails(struct User u)
     }
 
     sqlite3_bind_int(stmt, 1, u.id);
-
-    printf("\nYour accounts:\n");
-    printf("═══════════════════════════════════════════════════════════════\n");
+    showAccountSelectionHeader();
 
     int found = 0;
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && accountCount < 100)
@@ -886,8 +884,8 @@ void removeAccount(struct User u)
     int accountIds[100]; // Array to store account IDs
     int accountCount = 0;
 
-    system("clear");
-    printf("\t\t\t===== Remove Account =====\n");
+    clearScreen();
+    showRemovalHeader();
 
     // First, show user's accounts with selection numbers
     char list_sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE user_id = ?";
@@ -903,22 +901,18 @@ void removeAccount(struct User u)
 
     sqlite3_bind_int(stmt, 1, u.id);
 
-    printf("\nYour accounts:\n");
-    printf("═══════════════════════════════════════════════════════════════\n");
-
+    showAccountSelectionHeader();
     int found = 0;
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && accountCount < 100)
     {
         found = 1;
         accountCount++;
         accountIds[accountCount - 1] = sqlite3_column_int(stmt, 0); // Store account ID
-
-        printf("[%d] Account ID: %d (%s)\n", accountCount, accountIds[accountCount - 1],
-               sqlite3_column_text(stmt, 5)); // Show account type
-        printf("    Balance: $%.2f\n", sqlite3_column_double(stmt, 4));
-        printf("    Country: %s | Phone: %s\n",
-               sqlite3_column_text(stmt, 2), sqlite3_column_text(stmt, 3));
-        printf("───────────────────────────────────────────────────────────────\n");
+        showAccountItemWithDetails(accountCount, accountIds[accountCount - 1],
+                                   (const char *)sqlite3_column_text(stmt, 5),
+                                   sqlite3_column_double(stmt, 4),
+                                   (const char *)sqlite3_column_text(stmt, 2),
+                                   (const char *)sqlite3_column_text(stmt, 3));
     }
     sqlite3_finalize(stmt);
 
@@ -941,8 +935,7 @@ void removeAccount(struct User u)
 
         if (accountChoice < 1 || accountChoice > accountCount)
         {
-            printf("✖ Invalid selection! Please choose a number between 1 and %d.\n", accountCount);
-            sleep(2);
+            showInvalidSelectionError(accountCount);
             continue;
         }
         break;
@@ -975,34 +968,20 @@ void removeAccount(struct User u)
         return;
     }
 
-    // Display account details for confirmation
-    system("clear");
-    printf("\t\t\t===== Remove Account =====\n");
-    printf("\n⚠️  WARNING: Account Deletion Confirmation\n");
-    printf("═══════════════════════════════════════════════════════════════\n");
-    printf("Account Number : %d\n", sqlite3_column_int(stmt, 0));
-    printf("Deposit Date   : %s\n", sqlite3_column_text(stmt, 1));
-    printf("Country        : %s\n", sqlite3_column_text(stmt, 2));
-    printf("Phone Number   : %s\n", sqlite3_column_text(stmt, 3));
-    printf("Balance        : $%.2f\n", sqlite3_column_double(stmt, 4));
-    printf("Account Type   : %s\n", sqlite3_column_text(stmt, 5));
-    printf("═══════════════════════════════════════════════════════════════\n");
-
+    // Store account details for display and later use
+    int accountId = sqlite3_column_int(stmt, 0);
+    const char *depositDate = (const char *)sqlite3_column_text(stmt, 1);
+    const char *country = (const char *)sqlite3_column_text(stmt, 2);
+    const char *phone = (const char *)sqlite3_column_text(stmt, 3);
     double balance = sqlite3_column_double(stmt, 4);
+    const char *accountType = (const char *)sqlite3_column_text(stmt, 5);
+
+    // Display account details for confirmation
+    clearScreen();
+    showRemovalWarning(accountId, depositDate, country, phone, balance, accountType);
+    showRemovalConfirmationMenu();
+
     sqlite3_finalize(stmt);
-
-    printf("\n🚨 CRITICAL WARNING:\n");
-    printf("• This action will PERMANENTLY delete this account\n");
-    printf("• Account balance of $%.2f will be LOST\n", balance);
-    printf("• This action CANNOT be undone\n");
-    printf("• All account history will be removed\n");
-
-    printf("\n═══════════════════════════════════════════════════════════════\n");
-    printf("Deletion Confirmation:\n");
-    printf("[1] Proceed with deletion\n");
-    printf("[2] Cancel and return to main menu\n");
-    printf("═══════════════════════════════════════════════════════════════\n");
-
     int deleteChoice;
     do
     {
@@ -1014,15 +993,11 @@ void removeAccount(struct User u)
 
         if (deleteChoice == 2)
         {
-            printf("\n✔ Account deletion cancelled. Returning to main menu...\n");
-            sleep(2);
-            mainMenu(u);
-            return;
+            showCancelledAction("deletion", u);
         }
         else if (deleteChoice != 1)
         {
-            printf("✖ Invalid choice! Please enter 1 to proceed or 2 to cancel.\n");
-            sleep(2);
+            showValidationError("choice", "Please enter 1 to proceed or 2 to cancel.");
             continue;
         }
         break;
@@ -1040,8 +1015,7 @@ void removeAccount(struct User u)
 
         if (strcmp(confirmation, "DELETE") != 0)
         {
-            printf("✖ Confirmation failed! You must type 'DELETE' exactly.\n");
-            sleep(3);
+            showConfirmationInput("DELETE");
             continue;
         }
         break;
@@ -1069,15 +1043,8 @@ void removeAccount(struct User u)
 
     if (rc == SQLITE_DONE)
     {
-        system("clear");
-        printf("\t\t\t===== Account Deletion Complete =====\n");
-        printf("\n✔ SUCCESS: Account has been permanently deleted!\n");
-        printf("\n═══════════════ Deletion Summary ═══════════════\n");
-        printf("Deleted Account ID: %d\n", selectedAccountId);
-        printf("Previous Balance  : $%.2f\n", balance);
-        printf("Status           : Permanently Removed\n");
-        printf("═══════════════════════════════════════════════\n");
-
+        clearScreen();
+        showRemovalSuccess(selectedAccountId, balance);
         success(u);
     }
     else
