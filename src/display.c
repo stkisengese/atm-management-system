@@ -26,18 +26,18 @@ void showSuccessMessage()
     printf("\n✔ Success!\n\n");
 }
 
-void showErrorMessage(const char* message)
+void showErrorMessage(const char *message)
 {
     printf("\n\t\t ✖ %s\n", message);
     sleep(2);
 }
 
-void showWarningMessage(const char* message)
+void showWarningMessage(const char *message)
 {
     printf("\n⚠️  %s\n", message);
 }
 
-void showInfoMessage(const char* message)
+void showInfoMessage(const char *message)
 {
     printf("\n💡 %s\n", message);
 }
@@ -71,7 +71,7 @@ void showMainMenu(struct User u)
     printf("\t\t╚═══════════════════════════════════════════╝\n");
 }
 
-void showLoginMenu() 
+void showLoginMenu()
 {
     printf("\n\t\t Welcome to the ATM System\n");
     printf("\t\t Please select an option:\n\n");
@@ -94,7 +94,7 @@ void showAccountTypeMenu()
     printf("═══════════════════════════════════════════════════════════════\n");
 }
 
-void showTransactionMenu(int selectedAccountId, const char *accountType, 
+void showTransactionMenu(int selectedAccountId, const char *accountType,
                          double currentBalance)
 {
     printf("\t\t\t===== Make Transaction =====\n");
@@ -139,29 +139,29 @@ void showAccountTypeInfo(int accountTypeChoice)
 {
     switch (accountTypeChoice)
     {
-        case 1:
-            printf("📌 Note: Savings account features:\n");
-            printf("   • Earn interest on deposits\n");
-            printf("   • Suitable for long-term savings\n");
-            printf("   • Flexible deposits and withdrawals\n");
-            break;
-        case 2:
-            printf("📌 Note: Current account features:\n");
-            printf("   • Designed for frequent transactions\n");
-            printf("   • No interest earned\n");
-            printf("   • Unlimited deposits and withdrawals\n");
-            break;
-        case 3:
-        case 4:
-        case 5:
-            {
-                int years = accountTypeChoice - 2;
-                printf("📌 Note: Fixed deposit account for %d year(s)\n", years);
-                printf("   • Higher interest rate\n");
-                printf("   • No withdrawals/deposits allowed during term\n");
-                printf("   • Funds locked until maturity\n");
-            }
-            break;
+    case 1:
+        printf("📌 Note: Savings account features:\n");
+        printf("   • Earn interest on deposits\n");
+        printf("   • Suitable for long-term savings\n");
+        printf("   • Flexible deposits and withdrawals\n");
+        break;
+    case 2:
+        printf("📌 Note: Current account features:\n");
+        printf("   • Designed for frequent transactions\n");
+        printf("   • No interest earned\n");
+        printf("   • Unlimited deposits and withdrawals\n");
+        break;
+    case 3:
+    case 4:
+    case 5:
+    {
+        int years = accountTypeChoice - 2;
+        printf("📌 Note: Fixed deposit account for %d year(s)\n", years);
+        printf("   • Higher interest rate\n");
+        printf("   • No withdrawals/deposits allowed during term\n");
+        printf("   • Funds locked until maturity\n");
+    }
+    break;
     }
 }
 
@@ -173,8 +173,8 @@ void showAccountTypeInfo(int accountTypeChoice)
 //     printf("═══════════════════════════════════════════════════════════════\n");
 // }
 
-// void showAccountListItem(int itemNumber, int accountId, const char* accountType, 
-//                         const char* depositDate, const char* country, 
+// void showAccountListItem(int itemNumber, int accountId, const char* accountType,
+//                         const char* depositDate, const char* country,
 //                         const char* phone, double balance)
 // {
 //     printf("\n[%d] ══════════════════════════════════════════════════════════\n", itemNumber);
@@ -184,7 +184,7 @@ void showAccountTypeInfo(int accountTypeChoice)
 //     printf("Country         : %s\n", country);
 //     printf("Phone Number    : %s\n", phone);
 //     printf("Current Balance : $%.2f\n", balance);
-    
+
 //     // Display account status
 //     if (strstr(accountType, "fixed") != NULL)
 //     {
@@ -202,7 +202,7 @@ void showAccountTypeInfo(int accountTypeChoice)
 //     {
 //         printf("Status          : Active\n");
 //     }
-    
+
 //     printf("──────────────────────────────────────────────────────────────\n");
 // }
 
@@ -212,14 +212,14 @@ void showAccountTypeInfo(int accountTypeChoice)
 //     printf("Total Accounts  : %d\n", totalAccounts);
 //     printf("Combined Balance: $%.2f\n", totalBalance);
 //     printf("═══════════════════════════════════════════════════════════════\n");
-    
+
 //     if (totalAccounts > 1)
 //     {
 //         printf("\n💼 Portfolio Diversification:\n");
 //         printf("   • You have multiple accounts for better financial management\n");
 //         printf("   • Consider different account types for various savings goals\n");
 //     }
-    
+
 //     printf("\n📊 Quick Actions Available:\n");
 //     printf("   • View detailed account info: Use option [3]\n");
 //     printf("   • Make transactions: Use option [5]\n");
@@ -234,7 +234,7 @@ void showAccountTypeInfo(int accountTypeChoice)
 // }
 
 void showAccountDetails(int accountId, const char *depositDate, const char *country,
-                       const char *phone, double balance, const char *accountType)
+                        const char *phone, double balance, const char *accountType)
 {
     printf("\t\t\t===== Check Account Details =====\n");
     printf("\n════════════════════ Account Details ═════════════════════\n");
@@ -262,8 +262,8 @@ void showAccountDetails(int accountId, const char *depositDate, const char *coun
 //     printf("Current Balance: $%.2f\n", balance);
 // }
 
-void showTransactionSummary(int accountId, const char* transactionType, 
-                           double amount, double currentBalance, double newBalance)
+void showTransactionSummary(int accountId, const char *transactionType,
+                            double amount, double currentBalance, double newBalance)
 {
     printf("\n═══════════════ Transaction Summary ═══════════════\n");
     printf("Account ID      : %d\n", accountId);
@@ -296,55 +296,55 @@ void showTransactionSummary(int accountId, const char* transactionType,
 //     printf("\n→ Updating %s from previous value to: %s\n", field, newValue);
 // }
 
-// // =====================================================
-// // REMOVAL DISPLAY FUNCTIONS
-// // =====================================================
+// =====================================================
+// REMOVAL DISPLAY FUNCTIONS
+// =====================================================
 
-// void showRemovalHeader()
-// {
-//     printf("\t\t\t===== Remove Account =====\n");
-// }
+void showRemovalHeader()
+{
+    printf("\t\t\t===== Remove Account =====\n");
+}
 
-// void showRemovalWarning(int accountId, const char* depositDate, const char* country,
-//                        const char* phone, double balance, const char* accountType)
-// {
-//     printf("\t\t\t===== Remove Account =====\n");
-//     printf("\n⚠️  WARNING: Account Deletion Confirmation\n");
-//     printf("═══════════════════════════════════════════════════════════════\n");
-//     printf("Account Number : %d\n", accountId);
-//     printf("Deposit Date   : %s\n", depositDate);
-//     printf("Country        : %s\n", country);
-//     printf("Phone Number   : %s\n", phone);
-//     printf("Balance        : $%.2f\n", balance);
-//     printf("Account Type   : %s\n", accountType);
-//     printf("═══════════════════════════════════════════════════════════════\n");
-    
-//     printf("\n🚨 CRITICAL WARNING:\n");
-//     printf("• This action will PERMANENTLY delete this account\n");
-//     printf("• Account balance of $%.2f will be LOST\n", balance);
-//     printf("• This action CANNOT be undone\n");
-//     printf("• All account history will be removed\n");
-// }
+void showRemovalWarning(int accountId, const char *depositDate, const char *country,
+                        const char *phone, double balance, const char *accountType)
+{
+    printf("\t\t\t===== Remove Account =====\n");
+    printf("\n⚠️  WARNING: Account Deletion Confirmation\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+    printf("Account Number : %d\n", accountId);
+    printf("Deposit Date   : %s\n", depositDate);
+    printf("Country        : %s\n", country);
+    printf("Phone Number   : %s\n", phone);
+    printf("Balance        : $%.2f\n", balance);
+    printf("Account Type   : %s\n", accountType);
+    printf("═══════════════════════════════════════════════════════════════\n");
 
-// void showRemovalConfirmationMenu()
-// {
-//     printf("\n═══════════════════════════════════════════════════════════════\n");
-//     printf("Deletion Confirmation:\n");
-//     printf("[1] Proceed with deletion\n");
-//     printf("[2] Cancel and return to main menu\n");
-//     printf("═══════════════════════════════════════════════════════════════\n");
-// }
+    printf("\n🚨 CRITICAL WARNING:\n");
+    printf("• This action will PERMANENTLY delete this account\n");
+    printf("• Account balance of $%.2f will be LOST\n", balance);
+    printf("• This action CANNOT be undone\n");
+    printf("• All account history will be removed\n");
+}
 
-// void showRemovalSuccess(int accountId, double balance)
-// {
-//     printf("\t\t\t===== Account Deletion Complete =====\n");
-//     printf("\n✔ SUCCESS: Account has been permanently deleted!\n");
-//     printf("\n═══════════════ Deletion Summary ═══════════════\n");
-//     printf("Deleted Account ID: %d\n", accountId);
-//     printf("Previous Balance  : $%.2f\n", balance);
-//     printf("Status           : Permanently Removed\n");
-//     printf("═══════════════════════════════════════════════\n");
-// }
+void showRemovalConfirmationMenu()
+{
+    printf("\n═══════════════════════════════════════════════════════════════\n");
+    printf("Deletion Confirmation:\n");
+    printf("[1] Proceed with deletion\n");
+    printf("[2] Cancel and return to main menu\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+}
+
+void showRemovalSuccess(int accountId, double balance)
+{
+    printf("\t\t\t===== Account Deletion Complete =====\n");
+    printf("\n✔ SUCCESS: Account has been permanently deleted!\n");
+    printf("\n═══════════════ Deletion Summary ═══════════════\n");
+    printf("Deleted Account ID: %d\n", accountId);
+    printf("Previous Balance  : $%.2f\n", balance);
+    printf("Status           : Permanently Removed\n");
+    printf("═══════════════════════════════════════════════\n");
+}
 
 // // =====================================================
 // // TRANSFER DISPLAY FUNCTIONS
@@ -374,7 +374,7 @@ void showTransactionSummary(int accountId, const char* transactionType,
 //     printf("From           : %s (You)\n", fromUser);
 //     printf("To             : %s\n", toUser);
 //     printf("═══════════════════════════════════════════════════════════════\n");
-    
+
 //     printf("\n🚨 IMPORTANT WARNINGS:\n");
 //     printf("• You will LOSE complete access to this account\n");
 //     printf("• %s will become the new owner\n", toUser);
@@ -451,41 +451,55 @@ void showInputErrorMessage()
 //     printf("\n→ Processing %s...\n", action);
 // }
 
-// void showDivider()
-// {
-//     printf("═══════════════════════════════════════════════════════════════\n");
-// }
+void showDivider()
+{
+    printf("═══════════════════════════════════════════════════════════════\n");
+}
 
-// void showShortDivider()
-// {
-//     printf("───────────────────────────────────────────────────────────────\n");
-// }
+void showShortDivider()
+{
+    printf("───────────────────────────────────────────────────────────────\n");
+}
 
 // =====================================================
 // VALIDATION MESSAGE FUNCTIONS
 // =====================================================
 
-void showValidationError(const char* field, const char* requirement)
+void showValidationError(const char *field, const char *requirement)
 {
     printf("✖ Invalid %s! %s\n", field, requirement);
     sleep(2);
 }
 
-// void showConfirmationPrompt(const char* action)
-// {
-//     printf("\n--- Final Security Confirmation ---\n");
-//     printf("Type '%s' to confirm %s: ", action, action);
-// }
+void showInvalidSelectionError(int maxCount)
+{
+    printf("✖ Invalid selection! Please choose a number between 1 and %d.\n", maxCount);
+    sleep(2);
+}
+
+void showCancelledAction(const char *action, struct User u)
+{
+    printf("\n✔ Account %s cancelled. Returning to main menu...\n", action);
+    sleep(2);
+    mainMenu(u);
+    return;
+}
+
+void showConfirmationInput(const char *action)
+{
+    printf("✖ Confirmation failed! You must type '%s' exactly.\n", action);
+    sleep(3);
+}
 
 // // =====================================================
 // // ACCOUNT SELECTION FUNCTIONS
 // // =====================================================
 
-// void showAccountSelectionHeader(const char* action)
-// {
-//     printf("\nYour accounts %s:\n", action);
-//     showDivider();
-// }
+void showAccountSelectionHeader()
+{
+    printf("\nYour accounts:\n");
+    showDivider();
+}
 
 // void showSimpleAccountItem(int itemNumber, int accountId, const char* accountType, double balance)
 // {
@@ -494,11 +508,11 @@ void showValidationError(const char* field, const char* requirement)
 //     showShortDivider();
 // }
 
-// void showAccountItemWithDetails(int itemNumber, int accountId, const char* accountType, 
-//                                double balance, const char* country, const char* phone)
-// {
-//     printf("[%d] Account ID: %d (%s)\n", itemNumber, accountId, accountType);
-//     printf("    Balance: $%.2f\n", balance);
-//     printf("    Country: %s | Phone: %s\n", country, phone);
-//     showShortDivider();
-// }
+void showAccountItemWithDetails(int itemNumber, int accountId, const char *accountType,
+                                double balance, const char *country, const char *phone)
+{
+    printf("[%d] Account ID: %d (%s)\n", itemNumber, accountId, accountType);
+    printf("    Balance: $%.2f\n", balance);
+    printf("    Country: %s | Phone: %s\n", country, phone);
+    showShortDivider();
+}
