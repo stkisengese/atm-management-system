@@ -1065,8 +1065,8 @@ void transferOwnership(struct User u)
     int accountIds[100]; // Array to store account IDs
     int accountCount = 0;
 
-    system("clear");
-    printf("\t\t\t===== Transfer Account Ownership =====\n");
+    clearScreen();
+    showTransferHeader();
 
     // First, show user's accounts with selection numbers
     char list_sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE user_id = ?";
@@ -1082,23 +1082,18 @@ void transferOwnership(struct User u)
 
     sqlite3_bind_int(stmt, 1, u.id);
 
-    printf("\nYour accounts available for transfer:\n");
-    printf("═══════════════════════════════════════════════════════════════\n");
-
+    showAccountSelectionHeader();
     int found = 0;
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && accountCount < 100)
     {
         found = 1;
         accountCount++;
         accountIds[accountCount - 1] = sqlite3_column_int(stmt, 0); // Store account ID
-
-        printf("[%d] Account ID: %d (%s)\n", accountCount, accountIds[accountCount - 1],
-               sqlite3_column_text(stmt, 5)); // Show account type
-        printf("    Balance: $%.2f\n", sqlite3_column_double(stmt, 4));
-        printf("    Country: %s | Phone: %s\n",
-               sqlite3_column_text(stmt, 2), sqlite3_column_text(stmt, 3));
-        printf("    Deposit Date: %s\n", sqlite3_column_text(stmt, 1));
-        printf("───────────────────────────────────────────────────────────────\n");
+        showAccountItemWithDetails(accountCount, accountIds[accountCount - 1],
+                                   (const char *)sqlite3_column_text(stmt, 5),  // account type
+                                   sqlite3_column_double(stmt, 4),              // account balance
+                                   (const char *)sqlite3_column_text(stmt, 2),  // country
+                                   (const char *)sqlite3_column_text(stmt, 3)); // phone number
     }
     sqlite3_finalize(stmt);
 
@@ -1121,8 +1116,7 @@ void transferOwnership(struct User u)
 
         if (accountChoice < 1 || accountChoice > accountCount)
         {
-            printf("✖ Invalid selection! Please choose a number between 1 and %d.\n", accountCount);
-            sleep(2);
+            showInvalidSelectionError(accountCount);
             continue;
         }
         break;
@@ -1165,29 +1159,14 @@ void transferOwnership(struct User u)
     double balance = sqlite3_column_double(stmt, 4);
     sqlite3_finalize(stmt);
 
-    system("clear");
-    printf("\t\t\t===== Transfer Account Ownership =====\n");
-    printf("\n✔ Selected Account ID: %d (%s)\n", selectedAccountId, accountType);
-    printf("Current Balance: $%.2f\n", balance);
-
-    // Get target username with validation
-    printf("\n═══════════════════════════════════════════════════════════════\n");
-    printf("Transfer Recipient Information:\n");
-    printf("═══════════════════════════════════════════════════════════════\n");
+    clearScreen();
+    showTransferAccountDisplay(selectedAccountId, accountType, balance);
 
     do
     {
         if (!safeStringInput(targetUsername, sizeof(targetUsername), "\nEnter recipient's username: "))
         {
             showInputErrorMessage();
-            continue;
-        }
-
-        // Validate username format (basic validation)
-        if (strlen(targetUsername) < 3)
-        {
-            printf("✖ Username must be at least 3 characters long!\n");
-            sleep(2);
             continue;
         }
 
@@ -1220,35 +1199,11 @@ void transferOwnership(struct User u)
     } while (1);
 
     // Show transfer confirmation
-    system("clear");
-    printf("\t\t\t===== Transfer Account Ownership =====\n");
-    printf("\n⚠️  OWNERSHIP TRANSFER CONFIRMATION\n");
-    printf("═══════════════════════════════════════════════════════════════\n");
-    printf("ACCOUNT TO TRANSFER:\n");
-    printf("Account Number : %d\n", accountId);
-    printf("Account Type   : %s\n", accountType);
-    printf("Balance        : $%.2f\n", balance);
-    printf("Country        : %s\n", country);
-    printf("Phone Number   : %s\n", phone);
-    printf("Deposit Date   : %s\n", depositDate);
-    printf("───────────────────────────────────────────────────────────────\n");
-    printf("TRANSFER DETAILS:\n");
-    printf("From           : %s (You)\n", u.name);
-    printf("To             : %s\n", targetUsername);
-    printf("═══════════════════════════════════════════════════════════════\n");
+    clearScreen();
+    showTransferConfirmation(accountId, accountType, balance, country, phone, depositDate,
+                             u.name, targetUsername);
 
-    printf("\n🚨 IMPORTANT WARNINGS:\n");
-    printf("• You will LOSE complete access to this account\n");
-    printf("• %s will become the new owner\n", targetUsername);
-    printf("• This transfer is PERMANENT and cannot be undone\n");
-    printf("• All future transactions will require the new owner's authorization\n");
-
-    printf("\n═══════════════════════════════════════════════════════════════\n");
-    printf("Transfer Confirmation:\n");
-    printf("[1] Proceed with ownership transfer\n");
-    printf("[2] Cancel and return to main menu\n");
-    printf("═══════════════════════════════════════════════════════════════\n");
-
+    showTransferConfirmationMenu();
     int transferChoice;
     do
     {
@@ -1260,15 +1215,11 @@ void transferOwnership(struct User u)
 
         if (transferChoice == 2)
         {
-            printf("\n✔ Transfer cancelled. Returning to main menu...\n");
-            sleep(2);
-            mainMenu(u);
-            return;
+            showCancelledAction("transfer", u);
         }
         else if (transferChoice != 1)
         {
-            printf("✖ Invalid choice! Please enter 1 to proceed or 2 to cancel.\n");
-            sleep(2);
+            showValidationError("choice", "Please enter 1 to proceed or 2 to cancel.");
             continue;
         }
         break;
@@ -1287,8 +1238,7 @@ void transferOwnership(struct User u)
 
         if (strcmp(confirmation, "TRANSFER") != 0)
         {
-            printf("✖ Confirmation failed! You must type 'TRANSFER' exactly.\n");
-            sleep(3);
+            showConfirmationInput("TRANSFER");
             continue;
         }
         break;
@@ -1318,19 +1268,8 @@ void transferOwnership(struct User u)
 
     if (rc == SQLITE_DONE)
     {
-        system("clear");
-        printf("\t\t\t===== Transfer Complete =====\n");
-        printf("\n✔ SUCCESS: Ownership transfer completed!\n");
-        printf("\n═══════════════ Transfer Summary ═══════════════\n");
-        printf("Transferred Account: %d (%s)\n", selectedAccountId, accountType);
-        printf("Account Balance    : $%.2f\n", balance);
-        printf("Previous Owner     : %s\n", u.name);
-        printf("New Owner          : %s\n", targetUsername);
-        printf("Transfer Status    : Completed Successfully\n");
-        printf("═══════════════════════════════════════════════\n");
-        printf("\nNOTE: You no longer have access to this account.\n");
-        printf("%s is now the sole owner and can manage all account activities.\n", targetUsername);
-
+        clearScreen();
+        showTransferSuccess(selectedAccountId, accountType, balance, u.name, targetUsername);
         success(u);
     }
     else
