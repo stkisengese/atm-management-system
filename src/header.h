@@ -107,12 +107,12 @@ void showUpdateDetails(const char *country, const char *phone);
 // =====================================================
 void showAccountCreationHeader();
 void showAccountTypeInfo(int accountTypeChoice);
-// void showAccountPortfolioHeader(const char* userName);
-// void showAccountListItem(int itemNumber, int accountId, const char* accountType,
-//                         const char* depositDate, const char* country,
-//                         const char* phone, double balance);
-// void showPortfolioSummary(int totalAccounts, double totalBalance);
-// void showNoAccountsMessage(const char* userName);
+void showAccountPortfolioHeader(const char *userName);
+void showAccountListItem(int itemNumber, int accountId, const char *accountType,
+                         const char *depositDate, const char *country,
+                         const char *phone, double balance);
+void showPortfolioSummary(int totalAccounts, double totalBalance);
+void showNoAccountsMessage(const char *userName);
 void showAccountDetails(int accountId, const char *depositDate, const char *country,
                         const char *phone, double balance, const char *accountType);
 
