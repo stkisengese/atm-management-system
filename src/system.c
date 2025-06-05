@@ -966,64 +966,17 @@ void transferOwnership(struct User u)
     clearScreen();
     showTransferHeader();
 
-    // First, show user's accounts with selection numbers
-    char list_sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE user_id = ?";
-    int rc = sqlite3_prepare_v2(db, list_sql, -1, &stmt, NULL);
-
-    if (rc != SQLITE_OK)
+    struct AccountSelection selection = selectUserAccount(u, "transfer");
+    if (!selection.success)
     {
-        printf("Database error: %s\n", sqlite3_errmsg(db));
-        sleep(2);
         mainMenu(u);
         return;
     }
-    sqlite3_bind_int(stmt, 1, u.id);
-
-    showAccountSelectionHeader();
-    int found = 0;
-    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && accountCount < 100)
-    {
-        found = 1;
-        accountCount++;
-        accountIds[accountCount - 1] = sqlite3_column_int(stmt, 0); // Store account ID
-        showAccountItemWithDetails(accountCount, accountIds[accountCount - 1],
-                                   (const char *)sqlite3_column_text(stmt, 5),  // account type
-                                   sqlite3_column_double(stmt, 4),              // account balance
-                                   (const char *)sqlite3_column_text(stmt, 2),  // country
-                                   (const char *)sqlite3_column_text(stmt, 3)); // phone number
-    }
-    sqlite3_finalize(stmt);
-
-    if (!found)
-    {
-        printf("No accounts found for transfer!\n");
-        sleep(2);
-        mainMenu(u);
-        return;
-    }
-
-    // Get user's account selection
-    do
-    {
-        if (!safeIntInput(&accountChoice, "\nSelect account to transfer (enter the number): "))
-        {
-            showRetryMessage();
-            continue;
-        }
-
-        if (accountChoice < 1 || accountChoice > accountCount)
-        {
-            showInvalidSelectionError(accountCount);
-            continue;
-        }
-        break;
-    } while (1);
-
-    int selectedAccountId = accountIds[accountChoice - 1];
+    int selectedAccountId = selection.selectedAccountId;
 
     // Get detailed account information for confirmation
     char detail_sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE account_id = ? AND user_id = ?";
-    rc = sqlite3_prepare_v2(db, detail_sql, -1, &stmt, NULL);
+    int rc = sqlite3_prepare_v2(db, detail_sql, -1, &stmt, NULL);
 
     if (rc != SQLITE_OK)
     {
