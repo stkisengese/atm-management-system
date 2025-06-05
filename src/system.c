@@ -378,20 +378,28 @@ void checkAllAccounts(struct User u)
 
     success(u);
 }
-void updateAccountInfo(struct User u)
+
+// Structure to hold account selection results
+struct AccountSelection
 {
+    int selectedAccountId;
+    int accountCount;
+    int accountIds[100];
+    int success; // 1 for success, 0 for failure
+};
+
+/**
+ * Common function to display user's accounts and get selection
+ * Returns AccountSelection structure with results
+ */
+struct AccountSelection selectUserAccount(struct User u, const char *operation)
+{
+    struct AccountSelection result = {0}; // Initialize all fields to 0
     sqlite3 *db = getDatabase();
     sqlite3_stmt *stmt;
     int accountChoice;
-    int updateChoice;
-    char newValue[100];
-    int accountIds[100]; // Array to store account IDs
-    int accountCount = 0;
 
-    clearScreen();
-    printf("\t\t\t===== Update Account Information =====\n");
-
-    // First, show user's accounts with selection numbers
+    // Show user's accounts with selection numbers
     char list_sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE user_id = ?";
     int rc = sqlite3_prepare_v2(db, list_sql, -1, &stmt, NULL);
 
@@ -399,20 +407,20 @@ void updateAccountInfo(struct User u)
     {
         printf("Database error: %s\n", sqlite3_errmsg(db));
         sleep(2);
-        mainMenu(u);
-        return;
+        result.success = 0;
+        return result;
     }
 
     sqlite3_bind_int(stmt, 1, u.id);
 
     showAccountSelectionHeader();
     int found = 0;
-    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && accountCount < 100)
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && result.accountCount < 100)
     {
         found = 1;
-        accountCount++;
-        accountIds[accountCount - 1] = sqlite3_column_int(stmt, 0); // Store account ID
-        showAccountItemWithDetails(accountCount, accountIds[accountCount - 1],
+        result.accountCount++;
+        result.accountIds[result.accountCount - 1] = sqlite3_column_int(stmt, 0); // Store account ID
+        showAccountItemWithDetails(result.accountCount, result.accountIds[result.accountCount - 1],
                                    (const char *)sqlite3_column_text(stmt, 5),  // account type
                                    sqlite3_column_double(stmt, 4),              // account balance
                                    (const char *)sqlite3_column_text(stmt, 2),  // country
@@ -423,32 +431,57 @@ void updateAccountInfo(struct User u)
     if (!found)
     {
         showErrorMessage("No accounts found for your user ID.");
-        mainMenu(u);
-        return;
+        result.success = 0;
+        return result;
     }
 
     // Get user's account selection
     do
     {
-        if (!safeIntInput(&accountChoice, "\nSelect account to update (enter the number): "))
+        char prompt[100];
+        snprintf(prompt, sizeof(prompt), "\nSelect account to %s (enter the number): ", operation);
+
+        if (!safeIntInput(&accountChoice, prompt))
         {
             showRetryMessage();
             continue;
         }
 
-        if (accountChoice < 1 || accountChoice > accountCount)
+        if (accountChoice < 1 || accountChoice > result.accountCount)
         {
-            showInvalidSelectionError(accountCount);
+            showInvalidSelectionError(result.accountCount);
             continue;
         }
         break;
     } while (1);
 
-    int selectedAccountId = accountIds[accountChoice - 1];
+    result.selectedAccountId = result.accountIds[accountChoice - 1];
+    result.success = 1;
+    return result;
+}
+
+void updateAccountInfo(struct User u)
+{
+    sqlite3 *db = getDatabase();
+    sqlite3_stmt *stmt;
+    int updateChoice;
+    char newValue[100];
+
+    clearScreen();
+    printf("\t\t\t===== Update Account Information =====\n");
+
+    struct AccountSelection selection = selectUserAccount(u, "update");
+    if (!selection.success)
+    {
+        mainMenu(u);
+        return;
+    }
+
+    int selectedAccountId = selection.selectedAccountId;
 
     // Get detailed account information for the selected account
     char detail_sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE account_id = ? AND user_id = ?";
-    rc = sqlite3_prepare_v2(db, detail_sql, -1, &stmt, NULL);
+    int rc = sqlite3_prepare_v2(db, detail_sql, -1, &stmt, NULL);
 
     if (rc != SQLITE_OK)
     {
