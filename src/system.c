@@ -451,7 +451,7 @@ void updateAccountInfo(struct User u)
 
         if (accountChoice < 1 || accountChoice > accountCount)
         {
-            showConfirmationInput(accountCount);
+            showInvalidSelectionError(accountCount);
             continue;
         }
         break;
@@ -608,7 +608,7 @@ void checkAccountDetails(struct User u)
 
         if (accountChoice < 1 || accountChoice > accountCount)
         {
-            showConfirmationInput(accountCount);
+            showInvalidSelectionError(accountCount);
             continue;
         }
         break;
@@ -673,7 +673,7 @@ void makeTransaction(struct User u)
     printf("\t\t\t===== Make Transaction =====\n");
 
     // First, show user's accounts with selection numbers
-    char list_sql[] = "SELECT account_id, balance, account_type FROM records WHERE user_id = ?";
+    char list_sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE user_id = ?";
     int rc = sqlite3_prepare_v2(db, list_sql, -1, &stmt, NULL);
 
     if (rc != SQLITE_OK)
@@ -683,23 +683,20 @@ void makeTransaction(struct User u)
         mainMenu(u);
         return;
     }
-
     sqlite3_bind_int(stmt, 1, u.id);
 
-    printf("\nAvailable accounts for transactions:\n");
-    printf("═══════════════════════════════════════════════════════════════\n");
-
+    showAccountSelectionHeader();
     int found = 0;
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && accountCount < 100)
     {
         found = 1;
         accountCount++;
         accountIds[accountCount - 1] = sqlite3_column_int(stmt, 0); // Store account ID
-
-        printf("[%d] Account ID: %d (%s)\n", accountCount, accountIds[accountCount - 1],
-               sqlite3_column_text(stmt, 2)); // Show account type
-        printf("    Current Balance: $%.2f\n", sqlite3_column_double(stmt, 1));
-        printf("───────────────────────────────────────────────────────────────\n");
+        showAccountItemWithDetails(accountCount, accountIds[accountCount - 1],
+                                   (const char *)sqlite3_column_text(stmt, 5),  // account type
+                                   sqlite3_column_double(stmt, 4),              // account balance
+                                   (const char *)sqlite3_column_text(stmt, 2),  // country
+                                   (const char *)sqlite3_column_text(stmt, 3)); // phone number
     }
     sqlite3_finalize(stmt);
 
@@ -721,7 +718,7 @@ void makeTransaction(struct User u)
 
         if (accountChoice < 1 || accountChoice > accountCount)
         {
-            showConfirmationInput(accountCount);
+            showInvalidSelectionError(accountCount);
             continue;
         }
         break;
@@ -858,10 +855,8 @@ void makeTransaction(struct User u)
 
     if (rc == SQLITE_DONE)
     {
-        printf("\n✔ Transaction completed successfully!\n");
-        printf("Account ID: %d\n", selectedAccountId);
-        printf("Transaction: %s $%.2f\n", (transactionType == 1) ? "Deposited" : "Withdrew", amount);
-        printf("New Balance: $%.2f\n", newBalance);
+        const char *transactionTypeStr = (transactionType == 1) ? "Deposited" : "Withdrew";
+        showTransactionResult(selectedAccountId, transactionTypeStr, amount, newBalance);
         success(u);
     }
     else
@@ -1076,7 +1071,6 @@ void transferOwnership(struct User u)
         mainMenu(u);
         return;
     }
-
     sqlite3_bind_int(stmt, 1, u.id);
 
     showAccountSelectionHeader();
