@@ -161,10 +161,9 @@ void showInputErrorMessage();
 // // void showDatabaseErrorMessage(struct User u, sqlite3 *db);
 // void showInvalidOperationMessage();
 
-// // =====================================================
-// // PROGRESS AND STATUS FUNCTIONS
-// // =====================================================
-// void showProcessingMessage(const char* action);
+// =====================================================
+// PROGRESS AND STATUS FUNCTIONS
+// =====================================================
 void showDivider();
 void showShortDivider();
 
@@ -176,11 +175,10 @@ void showInvalidSelectionError(int maxCount);
 void showCancelledAction(const char *action, struct User u);
 void showConfirmationInput(const char *action);
 
-// // =====================================================
-// // ACCOUNT SELECTION FUNCTIONS
-// // =====================================================
+// =====================================================
+// ACCOUNT SELECTION FUNCTIONS
+// =====================================================
 void showAccountSelectionHeader();
-// void showSimpleAccountItem(int itemNumber, int accountId, const char* accountType, double balance);
 void showAccountItemWithDetails(int itemNumber, int accountId, const char *accountType,
                                 double balance, const char *country, const char *phone);
 
