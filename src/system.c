@@ -287,10 +287,9 @@ void checkAllAccounts(struct User u)
 {
     sqlite3 *db = getDatabase();
     sqlite3_stmt *stmt;
-
     char sql[] = "SELECT account_id, deposit_date, country, phone, balance, account_type FROM records WHERE user_id = ?";
-
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+
     if (rc != SQLITE_OK)
     {
         printf("Database error: %s\n", sqlite3_errmsg(db));
@@ -300,12 +299,8 @@ void checkAllAccounts(struct User u)
     }
 
     sqlite3_bind_int(stmt, 1, u.id);
-
-    system("clear");
-    printf("\t\t\t===== Account Portfolio Overview =====\n");
-    printf("\n═══════════════════════════════════════════════════════════════\n");
-    printf("Account Owner: %s\n", u.name);
-    printf("═══════════════════════════════════════════════════════════════\n");
+    clearScreen();
+    showAccountPortfolioHeader(u.name);
 
     int found = 0;
     int accountNumber = 1;
@@ -316,35 +311,12 @@ void checkAllAccounts(struct User u)
         found = 1;
         double balance = sqlite3_column_double(stmt, 4);
         totalBalance += balance;
-
-        printf("\n[%d] ══════════════════════════════════════════════════════════\n", accountNumber);
-        printf("Account Number  : %d\n", sqlite3_column_int(stmt, 0));
-        printf("Account Type    : %s\n", sqlite3_column_text(stmt, 5));
-        printf("Deposit Date    : %s\n", sqlite3_column_text(stmt, 1));
-        printf("Country         : %s\n", sqlite3_column_text(stmt, 2));
-        printf("Phone Number    : %s\n", sqlite3_column_text(stmt, 3));
-        printf("Current Balance : $%.2f\n", balance);
-
-        // Display account status based on type
-        const char *accountType = (const char *)sqlite3_column_text(stmt, 5);
-        if (strstr(accountType, "fixed") != NULL)
-        {
-            printf("Status          : Fixed Term (No transactions allowed)\n");
-        }
-        else if (strcmp(accountType, "saving") == 0)
-        {
-            printf("Status          : Active Savings Account\n");
-        }
-        else if (strcmp(accountType, "current") == 0)
-        {
-            printf("Status          : Active Current Account\n");
-        }
-        else
-        {
-            printf("Status          : Active\n");
-        }
-
-        printf("──────────────────────────────────────────────────────────────\n");
+        showAccountListItem(accountNumber, sqlite3_column_int(stmt, 0),
+                            (const char *)sqlite3_column_text(stmt, 5),
+                            (const char *)sqlite3_column_text(stmt, 1),
+                            (const char *)sqlite3_column_text(stmt, 2),
+                            (const char *)sqlite3_column_text(stmt, 3),
+                            balance);
         accountNumber++;
     }
 
@@ -352,28 +324,11 @@ void checkAllAccounts(struct User u)
 
     if (!found)
     {
-        printf("\n📋 No accounts found for user: %s\n", u.name);
-        printf("\n💡 TIP: Create your first account using option [1] from the main menu.\n");
-        printf("═══════════════════════════════════════════════════════════════\n");
+        showNoAccountsMessage(u.name);
     }
     else
     {
-        printf("\n═══════════════════ Portfolio Summary ═══════════════════════\n");
-        printf("Total Accounts  : %d\n", accountNumber - 1);
-        printf("Combined Balance: $%.2f\n", totalBalance);
-        printf("═══════════════════════════════════════════════════════════════\n");
-
-        if (accountNumber > 2) // More than 1 account
-        {
-            printf("\n💼 Portfolio Diversification:\n");
-            printf("   • You have multiple accounts for better financial management\n");
-            printf("   • Consider different account types for various savings goals\n");
-        }
-
-        printf("\n📊 Quick Actions Available:\n");
-        printf("   • View detailed account info: Use option [3]\n");
-        printf("   • Make transactions: Use option [5]\n");
-        printf("   • Update account details: Use option [2]\n");
+        showPortfolioSummary(accountNumber - 1, totalBalance);
     }
 
     success(u);
@@ -600,10 +555,6 @@ void checkAccountDetails(struct User u)
 {
     sqlite3 *db = getDatabase();
     sqlite3_stmt *stmt;
-    int accountChoice;
-    int accountIds[100]; // Array to store account IDs
-    int accountCount = 0;
-
     clearScreen();
     printf("\t\t\t===== Check Account Details =====\n");
 
@@ -659,14 +610,11 @@ void makeTransaction(struct User u)
 {
     sqlite3 *db = getDatabase();
     sqlite3_stmt *stmt;
-    int accountChoice;
     int transactionType;
     char amountStr[50];
     double amount;
     double currentBalance;
     char accountType[20];
-    int accountIds[100]; // Array to store account IDs
-    int accountCount = 0;
 
     system("clear");
     printf("\t\t\t===== Make Transaction =====\n");
@@ -824,10 +772,7 @@ void removeAccount(struct User u)
 {
     sqlite3 *db = getDatabase();
     sqlite3_stmt *stmt;
-    int accountChoice;
     char confirmation[10];
-    int accountIds[100]; // Array to store account IDs
-    int accountCount = 0;
 
     clearScreen();
     showRemovalHeader();
@@ -957,11 +902,8 @@ void transferOwnership(struct User u)
 {
     sqlite3 *db = getDatabase();
     sqlite3_stmt *stmt;
-    int accountChoice;
     char targetUsername[50];
     int targetUserId;
-    int accountIds[100]; // Array to store account IDs
-    int accountCount = 0;
 
     clearScreen();
     showTransferHeader();
