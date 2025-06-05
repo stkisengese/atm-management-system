@@ -165,73 +165,73 @@ void showAccountTypeInfo(int accountTypeChoice)
     }
 }
 
-// void showAccountPortfolioHeader(const char* userName)
-// {
-//     printf("\t\t\t===== Account Portfolio Overview =====\n");
-//     printf("\n═══════════════════════════════════════════════════════════════\n");
-//     printf("Account Owner: %s\n", userName);
-//     printf("═══════════════════════════════════════════════════════════════\n");
-// }
+void showAccountPortfolioHeader(const char *userName)
+{
+    printf("\t\t\t===== Account Portfolio Overview =====\n");
+    printf("\n═══════════════════════════════════════════════════════════════\n");
+    printf("Account Owner: %s\n", userName);
+    printf("═══════════════════════════════════════════════════════════════\n");
+}
 
-// void showAccountListItem(int itemNumber, int accountId, const char* accountType,
-//                         const char* depositDate, const char* country,
-//                         const char* phone, double balance)
-// {
-//     printf("\n[%d] ══════════════════════════════════════════════════════════\n", itemNumber);
-//     printf("Account Number  : %d\n", accountId);
-//     printf("Account Type    : %s\n", accountType);
-//     printf("Deposit Date    : %s\n", depositDate);
-//     printf("Country         : %s\n", country);
-//     printf("Phone Number    : %s\n", phone);
-//     printf("Current Balance : $%.2f\n", balance);
+void showAccountListItem(int itemNumber, int accountId, const char *accountType,
+                         const char *depositDate, const char *country,
+                         const char *phone, double balance)
+{
+    printf("\n[%d] ══════════════════════════════════════════════════════════\n", itemNumber);
+    printf("Account Number  : %d\n", accountId);
+    printf("Account Type    : %s\n", accountType);
+    printf("Deposit Date    : %s\n", depositDate);
+    printf("Country         : %s\n", country);
+    printf("Phone Number    : %s\n", phone);
+    printf("Current Balance : $%.2f\n", balance);
 
-//     // Display account status
-//     if (strstr(accountType, "fixed") != NULL)
-//     {
-//         printf("Status          : Fixed Term (No transactions allowed)\n");
-//     }
-//     else if (strcmp(accountType, "saving") == 0)
-//     {
-//         printf("Status          : Active Savings Account\n");
-//     }
-//     else if (strcmp(accountType, "current") == 0)
-//     {
-//         printf("Status          : Active Current Account\n");
-//     }
-//     else
-//     {
-//         printf("Status          : Active\n");
-//     }
+    // Display account status
+    if (strstr(accountType, "fixed") != NULL)
+    {
+        printf("Status          : Fixed Term (No transactions allowed)\n");
+    }
+    else if (strcmp(accountType, "saving") == 0)
+    {
+        printf("Status          : Active Savings Account\n");
+    }
+    else if (strcmp(accountType, "current") == 0)
+    {
+        printf("Status          : Active Current Account\n");
+    }
+    else
+    {
+        printf("Status          : Active\n");
+    }
 
-//     printf("──────────────────────────────────────────────────────────────\n");
-// }
+    printf("──────────────────────────────────────────────────────────────\n");
+}
 
-// void showPortfolioSummary(int totalAccounts, double totalBalance)
-// {
-//     printf("\n═══════════════════ Portfolio Summary ═══════════════════════\n");
-//     printf("Total Accounts  : %d\n", totalAccounts);
-//     printf("Combined Balance: $%.2f\n", totalBalance);
-//     printf("═══════════════════════════════════════════════════════════════\n");
+void showPortfolioSummary(int totalAccounts, double totalBalance)
+{
+    printf("\n═══════════════════ Portfolio Summary ═══════════════════════\n");
+    printf("Total Accounts  : %d\n", totalAccounts);
+    printf("Combined Balance: $%.2f\n", totalBalance);
+    printf("═══════════════════════════════════════════════════════════════\n");
 
-//     if (totalAccounts > 1)
-//     {
-//         printf("\n💼 Portfolio Diversification:\n");
-//         printf("   • You have multiple accounts for better financial management\n");
-//         printf("   • Consider different account types for various savings goals\n");
-//     }
+    if (totalAccounts > 1)
+    {
+        printf("\n💼 Portfolio Diversification:\n");
+        printf("   • You have multiple accounts for better financial management\n");
+        printf("   • Consider different account types for various savings goals\n");
+    }
 
-//     printf("\n📊 Quick Actions Available:\n");
-//     printf("   • View detailed account info: Use option [3]\n");
-//     printf("   • Make transactions: Use option [5]\n");
-//     printf("   • Update account details: Use option [2]\n");
-// }
+    printf("\n📊 Quick Actions Available:\n");
+    printf("   • View detailed account info: Use option [3]\n");
+    printf("   • Make transactions: Use option [5]\n");
+    printf("   • Update account details: Use option [2]\n");
+}
 
-// void showNoAccountsMessage(const char* userName)
-// {
-//     printf("\n📋 No accounts found for user: %s\n", userName);
-//     printf("\n💡 TIP: Create your first account using option [1] from the main menu.\n");
-//     printf("═══════════════════════════════════════════════════════════════\n");
-// }
+void showNoAccountsMessage(const char *userName)
+{
+    printf("\n📋 No accounts found for user: %s\n", userName);
+    printf("\n💡 TIP: Create your first account using option [1] from the main menu.\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+}
 
 void showAccountDetails(int accountId, const char *depositDate, const char *country,
                         const char *phone, double balance, const char *accountType)
