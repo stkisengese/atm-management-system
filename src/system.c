@@ -407,8 +407,7 @@ void updateAccountInfo(struct User u)
 
     sqlite3_bind_int(stmt, 1, u.id);
 
-    printf("\nYour accounts:\n");
-    printf("═══════════════════════════════════════════════════════════════\n");
+    showAccountSelectionHeader();
     int found = 0;
 
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && accountCount < 100)
