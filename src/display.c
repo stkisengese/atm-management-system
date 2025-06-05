@@ -346,66 +346,77 @@ void showRemovalSuccess(int accountId, double balance)
     printf("═══════════════════════════════════════════════\n");
 }
 
-// // =====================================================
-// // TRANSFER DISPLAY FUNCTIONS
-// // =====================================================
+// =====================================================
+// TRANSFER DISPLAY FUNCTIONS
+// =====================================================
 
-// void showTransferHeader()
-// {
-//     printf("\t\t\t===== Transfer Account Ownership =====\n");
-// }
+void showTransferHeader()
+{
+    printf("\t\t\t===== Transfer Account Ownership =====\n");
+}
 
-// void showTransferConfirmation(int accountId, const char* accountType, double balance,
-//                              const char* country, const char* phone, const char* depositDate,
-//                              const char* fromUser, const char* toUser)
-// {
-//     printf("\t\t\t===== Transfer Account Ownership =====\n");
-//     printf("\n⚠️  OWNERSHIP TRANSFER CONFIRMATION\n");
-//     printf("═══════════════════════════════════════════════════════════════\n");
-//     printf("ACCOUNT TO TRANSFER:\n");
-//     printf("Account Number : %d\n", accountId);
-//     printf("Account Type   : %s\n", accountType);
-//     printf("Balance        : $%.2f\n", balance);
-//     printf("Country        : %s\n", country);
-//     printf("Phone Number   : %s\n", phone);
-//     printf("Deposit Date   : %s\n", depositDate);
-//     printf("───────────────────────────────────────────────────────────────\n");
-//     printf("TRANSFER DETAILS:\n");
-//     printf("From           : %s (You)\n", fromUser);
-//     printf("To             : %s\n", toUser);
-//     printf("═══════════════════════════════════════════════════════════════\n");
+void showTransferAccountDisplay(int accountId, const char *accountType, double balance)
+{
+    printf("\t\t\t===== Transfer Account Ownership =====\n");
+    printf("\n✔ Selected Account ID: %d (%s)\n", accountId, accountType);
+    printf("Current Balance: $%.2f\n", balance);
 
-//     printf("\n🚨 IMPORTANT WARNINGS:\n");
-//     printf("• You will LOSE complete access to this account\n");
-//     printf("• %s will become the new owner\n", toUser);
-//     printf("• This transfer is PERMANENT and cannot be undone\n");
-//     printf("• All future transactions will require the new owner's authorization\n");
-// }
+    // Get target username with validation
+    printf("\n═══════════════════════════════════════════════════════════════\n");
+    printf("Transfer Recipient Information:\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+}
+void showTransferConfirmation(int accountId, const char *accountType, double balance,
+                              const char *country, const char *phone, const char *depositDate,
+                              const char *fromUser, const char *toUser)
+{
+    printf("\t\t\t===== Transfer Account Ownership =====\n");
+    printf("\n⚠️  OWNERSHIP TRANSFER CONFIRMATION\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+    printf("ACCOUNT TO TRANSFER:\n");
+    printf("Account Number : %d\n", accountId);
+    printf("Account Type   : %s\n", accountType);
+    printf("Balance        : $%.2f\n", balance);
+    printf("Country        : %s\n", country);
+    printf("Phone Number   : %s\n", phone);
+    printf("Deposit Date   : %s\n", depositDate);
+    printf("───────────────────────────────────────────────────────────────\n");
+    printf("TRANSFER DETAILS:\n");
+    printf("From           : %s (You)\n", fromUser);
+    printf("To             : %s\n", toUser);
+    printf("═══════════════════════════════════════════════════════════════\n");
 
-// void showTransferConfirmationMenu()
-// {
-//     printf("\n═══════════════════════════════════════════════════════════════\n");
-//     printf("Transfer Confirmation:\n");
-//     printf("[1] Proceed with ownership transfer\n");
-//     printf("[2] Cancel and return to main menu\n");
-//     printf("═══════════════════════════════════════════════════════════════\n");
-// }
+    printf("\n🚨 IMPORTANT WARNINGS:\n");
+    printf("• You will LOSE complete access to this account\n");
+    printf("• %s will become the new owner\n", toUser);
+    printf("• This transfer is PERMANENT and cannot be undone\n");
+    printf("• All future transactions will require the new owner's authorization\n");
+}
 
-// void showTransferSuccess(int accountId, const char* accountType, double balance,
-//                         const char* fromUser, const char* toUser)
-// {
-//     printf("\t\t\t===== Transfer Complete =====\n");
-//     printf("\n✔ SUCCESS: Ownership transfer completed!\n");
-//     printf("\n═══════════════ Transfer Summary ═══════════════\n");
-//     printf("Transferred Account: %d (%s)\n", accountId, accountType);
-//     printf("Account Balance    : $%.2f\n", balance);
-//     printf("Previous Owner     : %s\n", fromUser);
-//     printf("New Owner          : %s\n", toUser);
-//     printf("Transfer Status    : Completed Successfully\n");
-//     printf("═══════════════════════════════════════════════\n");
-//     printf("\nNOTE: You no longer have access to this account.\n");
-//     printf("%s is now the sole owner and can manage all account activities.\n", toUser);
-// }
+void showTransferConfirmationMenu()
+{
+    printf("\n═══════════════════════════════════════════════════════════════\n");
+    printf("Transfer Confirmation:\n");
+    printf("[1] Proceed with ownership transfer\n");
+    printf("[2] Cancel and return to main menu\n");
+    printf("═══════════════════════════════════════════════════════════════\n");
+}
+
+void showTransferSuccess(int accountId, const char *accountType, double balance,
+                         const char *fromUser, const char *toUser)
+{
+    printf("\t\t\t===== Transfer Complete =====\n");
+    printf("\n✔ SUCCESS: Ownership transfer completed!\n");
+    printf("\n═══════════════ Transfer Summary ═══════════════\n");
+    printf("Transferred Account: %d (%s)\n", accountId, accountType);
+    printf("Account Balance    : $%.2f\n", balance);
+    printf("Previous Owner     : %s\n", fromUser);
+    printf("New Owner          : %s\n", toUser);
+    printf("Transfer Status    : Completed Successfully\n");
+    printf("═══════════════════════════════════════════════\n");
+    printf("\nNOTE: You no longer have access to this account.\n");
+    printf("%s is now the sole owner and can manage all account activities.\n", toUser);
+}
 
 // =====================================================
 // INPUT PROMPT FUNCTIONS
@@ -512,7 +523,7 @@ void showAccountItemWithDetails(int itemNumber, int accountId, const char *accou
                                 double balance, const char *country, const char *phone)
 {
     printf("[%d] Account ID: %d (%s)\n", itemNumber, accountId, accountType);
-    printf("    Balance: $%.2f\n", balance);
+    printf("    Current Balance: $%.2f\n", balance);
     printf("    Country: %s | Phone: %s\n", country, phone);
     showShortDivider();
 }
