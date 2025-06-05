@@ -274,13 +274,13 @@ void showTransactionSummary(int accountId, const char *transactionType,
     printf("═══════════════════════════════════════════════════\n");
 }
 
-// void showTransactionResult(int accountId, const char* transactionType, double amount, double newBalance)
-// {
-//     printf("\n✔ Transaction completed successfully!\n");
-//     printf("Account ID: %d\n", accountId);
-//     printf("Transaction: %s $%.2f\n", transactionType, amount);
-//     printf("New Balance: $%.2f\n", newBalance);
-// }
+void showTransactionResult(int accountId, const char *transactionType, double amount, double newBalance)
+{
+    printf("\n✔ Transaction completed successfully!\n");
+    printf("Account ID: %d\n", accountId);
+    printf("Transaction: %s $%.2f\n", transactionType, amount);
+    printf("New Balance: $%.2f\n", newBalance);
+}
 
 // // =====================================================
 // // UPDATE DISPLAY FUNCTIONS
