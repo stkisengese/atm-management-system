@@ -572,21 +572,19 @@ void checkAccountDetails(struct User u)
     }
 
     sqlite3_bind_int(stmt, 1, u.id);
-    showAccountSelectionHeader();
 
+    showAccountSelectionHeader();
     int found = 0;
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW && accountCount < 100)
     {
         found = 1;
         accountCount++;
         accountIds[accountCount - 1] = sqlite3_column_int(stmt, 0); // Store account ID
-
-        printf("[%d] Account ID: %d (%s)\n", accountCount, accountIds[accountCount - 1],
-               sqlite3_column_text(stmt, 5)); // Show account type
-        printf("    Balance: $%.2f\n", sqlite3_column_double(stmt, 4));
-        printf("    Country: %s | Phone: %s\n",
-               sqlite3_column_text(stmt, 2), sqlite3_column_text(stmt, 3));
-        printf("───────────────────────────────────────────────────────────────\n");
+        showAccountItemWithDetails(accountCount, accountIds[accountCount - 1],
+                                   (const char *)sqlite3_column_text(stmt, 5),
+                                   sqlite3_column_double(stmt, 4),
+                                   (const char *)sqlite3_column_text(stmt, 2),
+                                   (const char *)sqlite3_column_text(stmt, 3));
     }
     sqlite3_finalize(stmt);
 
