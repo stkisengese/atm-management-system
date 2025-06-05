@@ -123,7 +123,7 @@ void showAccountDetails(int accountId, const char *depositDate, const char *coun
 // void showSelectedAccount(int accountId, const char* accountType, double balance);
 void showTransactionSummary(int accountId, const char *transactionType,
                             double amount, double currentBalance, double newBalance);
-// void showTransactionResult(int accountId, const char* transactionType, double amount, double newBalance);
+void showTransactionResult(int accountId, const char *transactionType, double amount, double newBalance);
 
 // // =====================================================
 // // UPDATE DISPLAY FUNCTIONS
