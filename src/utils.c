@@ -134,3 +134,82 @@ int isFixedAccount(const char *accountType)
             strcmp(accountType, "fixed02") == 0 ||
             strcmp(accountType, "fixed03") == 0);
 }
+
+int authenticateUser(struct User *u, char *inputPass)
+{
+    if (!getPassword(u))
+    {
+        showErrorMessage("Username not found!");
+        return 0;
+    }
+
+    if (strcmp(inputPass, u->password) != 0)
+    {
+        showErrorMessage("Wrong password! Please try again.");
+        return 0;
+    }
+
+    printf("\n\t\t ✔ Login successful!\n");
+    printf("\t\t Welcome back, %s!\n", u->name);
+    sleep(1);
+    return 1;
+}
+
+int registerNewUser(struct User *u, char *temp_name, char *temp_pass)
+{
+    if (!registerUser(temp_name, temp_pass))
+    {
+        showErrorMessage("Registration failed! Username already exists.");
+        return 0;
+    }
+
+    // Populate user struct with new user details
+    strcpy(u->name, temp_name);
+    strcpy(u->password, temp_pass);
+
+    if (!getPassword(u))
+    {
+        showErrorMessage("Failed to retrieve user details after registration.");
+        return 0;
+    }
+
+    printf("\n\t\t ✔ Registration successful!\n");
+    printf("\t\t Welcome to the ATM system, %s!\n", u->name);
+    printf("\t\t You're now signed in.\n");
+    sleep(2);
+    return 1;
+}
+
+// Logout helper function
+void handleLogout(struct User u)
+{
+    printf("\n\t\t ✔ Logging out %s...\n", u.name);
+    printf("\t\t Returning to login screen.\n");
+    sleep(1);
+
+    struct User newUser = {0};
+    initMenu(&newUser);
+    mainMenu(newUser);
+}
+
+// Utility function to get valid menu input
+int getMenuChoice(const char *prompt, int min, int max)
+{
+    int option;
+
+    if (!safeIntInput(&option, prompt))
+    {
+        showInputErrorMessage();
+        return -1; // Invalid input
+    }
+
+    if (option < min || option > max)
+    {
+        char rangeMsg[100];
+        snprintf(rangeMsg, sizeof(rangeMsg), "Please choose a number between %d-%d.", min, max);
+        showValidationError("operation", rangeMsg);
+        return -1; // Out of range
+    }
+
+    return option;
+}
