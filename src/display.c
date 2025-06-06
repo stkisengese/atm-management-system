@@ -16,30 +16,16 @@ void showATMHeader()
     printf("\t\t\t╚══════════════════════════╝\n");
 }
 
-// void showWelcomeMessage()
-// {
-//     printf("\t\t\t===== Welcome to ATM System =====\n");
-// }
-
-void showSuccessMessage()
-{
-    printf("\n✔ Success!\n\n");
-}
-
 void showErrorMessage(const char *message)
 {
     printf("\n\t\t ✖ %s\n", message);
     sleep(2);
 }
 
-void showWarningMessage(const char *message)
+void showInputErrorMessage()
 {
-    printf("\n⚠️  %s\n", message);
-}
-
-void showInfoMessage(const char *message)
-{
-    printf("\n💡 %s\n", message);
+    printf("✖ Invalid input! Please try again.\n");
+    sleep(2);
 }
 
 void showThankYouMessage()
@@ -250,18 +236,6 @@ void showAccountDetails(int accountId, const char *depositDate, const char *coun
 // =====================================================
 // TRANSACTION DISPLAY FUNCTIONS
 // =====================================================
-
-// void showTransactionHeader()
-// {
-//     printf("\t\t\t===== Make Transaction =====\n");
-// }
-
-// void showSelectedAccount(int accountId, const char* accountType, double balance)
-// {
-//     printf("\n✔ Selected Account ID: %d (%s)\n", accountId, accountType);
-//     printf("Current Balance: $%.2f\n", balance);
-// }
-
 void showTransactionSummary(int accountId, const char *transactionType,
                             double amount, double currentBalance, double newBalance)
 {
@@ -281,20 +255,6 @@ void showTransactionResult(int accountId, const char *transactionType, double am
     printf("Transaction: %s $%.2f\n", transactionType, amount);
     printf("New Balance: $%.2f\n", newBalance);
 }
-
-// // =====================================================
-// // UPDATE DISPLAY FUNCTIONS
-// // =====================================================
-
-// void showUpdateHeader()
-// {
-//     printf("\t\t\t===== Update Account Information =====\n");
-// }
-
-// void showUpdateProgress(const char* field, const char* newValue)
-// {
-//     printf("\n→ Updating %s from previous value to: %s\n", field, newValue);
-// }
 
 // =====================================================
 // REMOVAL DISPLAY FUNCTIONS
@@ -419,43 +379,8 @@ void showTransferSuccess(int accountId, const char *accountType, double balance,
 }
 
 // =====================================================
-// INPUT PROMPT FUNCTIONS
+// PROGRESS AND STATUS FUNCTIONS
 // =====================================================
-
-// void showInputPrompt(const char* prompt)
-// {
-//     printf("%s", prompt);
-// }
-
-void showRetryMessage()
-{
-    printf("✖ Invalid input! Please try again.\n");
-    sleep(2);
-}
-
-void showInputErrorMessage()
-{
-    printf("✖ Input error! Please try again.\n");
-    sleep(2);
-}
-
-// // void showDatabaseErrorMessage(struct User u, sqlite3 *db)
-// // {
-// //     printf("✖ Database error: %s\n", sqlite3_errmsg(db));
-// //     sleep(2);
-// //     mainMenu(u);
-// //     return;
-// // }
-
-// void showInvalidOperationMessage()
-// {
-//     printf("✖ Invalid operation! Please choose a valid option.\n");
-//     sleep(2);
-// }
-
-// // =====================================================
-// // PROGRESS AND STATUS FUNCTIONS
-// // =====================================================
 
 void showDivider()
 {
