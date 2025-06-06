@@ -5,15 +5,14 @@ void loginMenu(char a[50], char pass[50])
     struct termios oflags, nflags;
 
     system("clear");
-    
+
     printf("\n\t\t\t╔══════════════════════════╗\n");
     printf("\t\t\t║         ATM SYSTEM       ║\n");
     printf("\t\t\t╠══════════════════════════╣\n");
     printf("\t\t\t║        USER LOGIN        ║\n");
     printf("\t\t\t╚══════════════════════════╝\n");
-    
+
     printf("\n\t\t Please enter your login credentials:\n");
-    
 
     printf("\t\t  Username: ");
     fflush(stdout);
@@ -24,7 +23,7 @@ void loginMenu(char a[50], char pass[50])
         return;
     }
     a[strcspn(a, "\n")] = '\0'; // remove newline
-    
+
     // disabling echo for password input
     tcgetattr(fileno(stdin), &oflags);
     nflags = oflags;
@@ -47,14 +46,14 @@ void loginMenu(char a[50], char pass[50])
         return;
     }
     pass[strcspn(pass, "\n")] = '\0';
-    
+
     // restore terminal
     if (tcsetattr(fileno(stdin), TCSANOW, &oflags) != 0)
     {
         perror("tcsetattr");
         exit(1);
     }
-    
+
     printf("\n\t\t Processing login...\n");
 }
 
@@ -67,13 +66,13 @@ void registerMenu(char a[50], char pass[50])
     while (1)
     {
         system("clear");
-        
+
         printf("\n\t\t\t╔══════════════════════════╗\n");
         printf("\t\t\t║         ATM SYSTEM       ║\n");
         printf("\t\t\t╠══════════════════════════╣\n");
         printf("\t\t\t║     USER REGISTRATION    ║\n");
         printf("\t\t\t╚══════════════════════════╝\n");
-        
+
         printf("\n\t\t Create your new account:\n");
 
         if (!safeStringInput(a, 50, "\t\t  Enter username: "))
@@ -88,7 +87,7 @@ void registerMenu(char a[50], char pass[50])
             sleep(2);
             continue;
         }
-        
+
         break; // username is valid
     }
 
@@ -96,16 +95,16 @@ void registerMenu(char a[50], char pass[50])
     while (1)
     {
         system("clear");
-        
+
         printf("\n\t\t\t╔══════════════════════════╗\n");
         printf("\t\t\t║         ATM SYSTEM       ║\n");
         printf("\t\t\t╠══════════════════════════╣\n");
         printf("\t\t\t║     USER REGISTRATION    ║\n");
         printf("\t\t\t╚══════════════════════════╝\n");
-        
+
         printf("\n\t\t Username: %s\n", a);
         printf("\n\t\t Set your password:\n");
-        
+
         // Disable echo for secure password input
         tcgetattr(fileno(stdin), &oflags);
         nflags = oflags;
