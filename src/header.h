@@ -43,6 +43,8 @@ struct User
 void clearInputBuffer();
 int safeStringInput(char *buffer, int size, const char *prompt);
 int safeIntInput(int *value, const char *prompt);
+void handleLogout(struct User u);
+int getMenuChoice(const char *prompt, int min, int max);
 
 // database functions
 int initDatabase();
@@ -50,7 +52,6 @@ sqlite3 *getDatabase();
 void closeDatabase();
 int accountExists(int accountId);
 int validateDate(int month, int day, int year);
-// int validateAccountType(char *accountType);
 int validateName(char *name);
 int validatePhone(const char *phoneStr);
 int validateAmount(const char *amountStr);
@@ -64,6 +65,8 @@ void registerMenu(char a[50], char pass[50]);
 int getPassword(struct User *u);
 int registerUser(char name[50], char password[50]);
 int validatePassword(const char *pass);
+int authenticateUser(struct User *u, char *inputPass);
+int registerNewUser(struct User *u, char *temp_name, char *temp_pass);
 
 // system function
 void createNewAcc(struct User u);
