@@ -10,7 +10,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
     invalid:
         if (!safeIntInput(&option, "\nEnter 0 to try again, 1 to return to main menu and 2 to exit: "))
         {
-            showRetryMessage();
+            showInputErrorMessage();
             goto invalid;
         }
 
@@ -33,7 +33,7 @@ void stayOrReturn(int notGood, void f(struct User u), struct User u)
     {
         if (!safeIntInput(&option, "\nEnter 1 to go to the main menu and 0 to exit: "))
         {
-            showRetryMessage();
+            showInputErrorMessage();
             option = 1;
         }
     }
@@ -57,7 +57,7 @@ void success(struct User u)
 invalid:
     if (!safeIntInput(&option, "Enter 1 to go to the main menu and 0 to exit: "))
     {
-        showRetryMessage();
+        showInputErrorMessage();
         goto invalid;
     }
 
@@ -94,19 +94,19 @@ void createNewAcc(struct User u)
         int month, day, year;
         if (!safeIntInput(&month, "\nEnter today's month (mm): "))
         {
-            showRetryMessage();
+            showInputErrorMessage();
             continue;
         }
 
         if (!safeIntInput(&day, "Enter today's day (dd): "))
         {
-            showRetryMessage();
+            showInputErrorMessage();
             continue;
         }
 
         if (!safeIntInput(&year, "Enter today's year (yyyy): "))
         {
-            showRetryMessage();
+            showInputErrorMessage();
             continue;
         }
 
@@ -207,7 +207,7 @@ void createNewAcc(struct User u)
         showAccountTypeMenu();
         if (!safeIntInput(&accountTypeChoice, "\nEnter your choice (1-5): "))
         {
-            showRetryMessage();
+            showInputErrorMessage();
             continue;
         }
 
@@ -398,7 +398,7 @@ struct AccountSelection selectUserAccount(struct User u, const char *operation)
 
         if (!safeIntInput(&accountChoice, prompt))
         {
-            showRetryMessage();
+            showInputErrorMessage();
             continue;
         }
 
@@ -471,7 +471,7 @@ void updateAccountInfo(struct User u)
     {
         if (!safeIntInput(&updateChoice, "\nEnter your choice (1 or 2): "))
         {
-            showRetryMessage();
+            showInputErrorMessage();
             continue;
         }
 
@@ -616,7 +616,7 @@ void makeTransaction(struct User u)
     double currentBalance;
     char accountType[20];
 
-    system("clear");
+    clearScreen();
     printf("\t\t\t===== Make Transaction =====\n");
 
     struct AccountSelection selection = selectUserAccount(u, "transaction");
@@ -662,7 +662,7 @@ void makeTransaction(struct User u)
     {
         if (!safeIntInput(&transactionType, "\nEnter your choice (1 or 2): "))
         {
-            showRetryMessage();
+            showInputErrorMessage();
             continue;
         }
 
@@ -726,7 +726,7 @@ void makeTransaction(struct User u)
     {
         if (!safeIntInput(&confirm, "\nConfirm transaction? [1] Yes [2] No: "))
         {
-            showRetryMessage();
+            showInputErrorMessage();
             continue;
         }
 
@@ -830,7 +830,7 @@ void removeAccount(struct User u)
     {
         if (!safeIntInput(&deleteChoice, "\nEnter your choice (1 or 2): "))
         {
-            showRetryMessage();
+            showInputErrorMessage();
             continue;
         }
 
@@ -1001,7 +1001,7 @@ void transferOwnership(struct User u)
     {
         if (!safeIntInput(&transferChoice, "\nEnter your choice (1 or 2): "))
         {
-            showRetryMessage();
+            showInputErrorMessage();
             continue;
         }
 
