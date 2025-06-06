@@ -962,6 +962,12 @@ void transferOwnership(struct User u)
             continue;
         }
 
+        if (!validateName(targetUsername))
+        {
+            sleep(2);
+            continue;
+        }
+
         // Check if user is trying to transfer to themselves
         if (strcmp(targetUsername, u.name) == 0)
         {
